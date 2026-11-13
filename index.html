@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo Malhuayza Motors</title>
+<meta name="description" content="Motos, scooters, trimotos y cuatrimotos en Huamanga, Ayacucho. Precios, colores, tiendas y financiamiento.">
+<meta property="og:title" content="Catálogo Malhuayza Motors">
+<meta property="og:description" content="Motos, scooters, trimotos y cuatrimotos en Huamanga. Precios, tiendas y financiamiento.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#d7191f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Plan: app de una sola página con barra de pestañas inferior translúcida (Catálogo, Tiendas, Financiamiento, Contacto),
+   rojo de marca con la bandera a cuadros, hojas inferiores arrastrables con resortes para los detalles. */
+:root{
+  --bg:#f4f4f2;
+  --surface:#ffffff;
+  --ink:#16181b;
+  --muted:#5f6670;
+  --line:#e2e2de;
+  --brand:#d7191f;
+  --brand-ink:#ffffff;
+  --brand-soft:#fde8e8;
+  --ok:#1f8a4c;
+  --ok-soft:#e3f4ea;
+  --wait:#9a6a00;
+  --wait-soft:#fbf1d6;
+  --new:#1f5fd6;
+  --new-soft:#e4ecfd;
+  --wa:#1fa855;
+  --shadow:0 1px 2px rgba(20,20,20,.06),0 4px 14px rgba(20,20,20,.06);
+  --font-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --radius:14px;
+  --glass:rgba(244,244,242,.72);
+  --glass-strong:rgba(250,250,248,.82);
+  --glass-edge:rgba(255,255,255,.55);
+  --scrim:rgba(10,10,12,.45);
+  --tabbar-h:64px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121315;--surface:#1c1e21;--ink:#f1f1ef;--muted:#a3a9b1;--line:#2d3035;
+    --brand:#ef3b40;--brand-ink:#ffffff;--brand-soft:#3a1c1d;
+    --ok:#4cc483;--ok-soft:#173527;--wait:#e5b44a;--wait-soft:#3a2f14;--new:#79a4ff;--new-soft:#1b2846;--wa:#2ec46a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+    --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121315;--surface:#1c1e21;--ink:#f1f1ef;--muted:#a3a9b1;--line:#2d3035;
+  --brand:#ef3b40;--brand-ink:#ffffff;--brand-soft:#3a1c1d;
+  --ok:#4cc483;--ok-soft:#173527;--wait:#e5b44a;--wait-soft:#3a2f14;--new:#79a4ff;--new-soft:#1b2846;--wa:#2ec46a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
+  --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 8px)}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Encabezado */
+.top{background:var(--brand);color:var(--brand-ink)}
+.checker{height:10px;background:conic-gradient(#111 25%,#fff 0 50%,#111 0 75%,#fff 0) 0 0/20px 20px;opacity:.9}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:16px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;line-height:1}
+.brand b{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.01em;text-transform:uppercase}
+.brand span{font-size:13px;opacity:.92;margin-top:5px}
+.open-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600}
+.open-pill i{width:8px;height:8px;border-radius:50%;background:#7CFFB0;box-shadow:0 0 0 3px rgba(124,255,176,.25)}
+.open-pill.closed i{background:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.25)}
+
+/* Vistas */
+.view{display:none}
+.view.on{display:block;animation:fadeIn 220ms ease}
+@keyframes fadeIn{from{opacity:.0}to{opacity:1}}
+.section-title{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.05;margin:0;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
+.section-sub{margin:4px 0 0;color:var(--muted);font-size:14px}
+[hidden]{display:none!important}
+.block{padding-top:18px;padding-bottom:4px}
+.block-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:12px}
+
+/* Explorar por tipo */
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.type-tile[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--tile,#333)}
+.type-tile[aria-pressed="true"]::after{content:"✓";position:absolute;top:8px;right:10px;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--tile,#333);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.type-tile{position:relative;overflow:hidden;border:0;border-radius:var(--radius);aspect-ratio:4/3;padding:12px;text-align:left;cursor:pointer;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;background:var(--tile,#333);box-shadow:var(--shadow)}
+.type-tile svg{position:absolute;right:-8%;top:8%;width:78%;height:auto;opacity:.28;color:#fff}
+.type-tile b{position:relative;font-family:var(--font-display);font-size:21px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.type-tile small{position:relative;font-size:12px;font-weight:600;opacity:.9;margin-top:3px}
+
+/* Marcas */
+.brands{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.brands::-webkit-scrollbar{display:none}
+.brand-tile{flex:none;scroll-snap-align:start;width:132px;height:84px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:var(--shadow);background-size:70% auto;background-position:center 40%;background-repeat:no-repeat}
+.brand-tile b{font-family:var(--font-display);font-size:24px;letter-spacing:.02em;line-height:1}
+.brand-tile small{font-size:11px;color:var(--muted);font-weight:600}
+.brand-tile.has-logo b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.brand-tile.has-logo{position:relative;justify-content:flex-end;padding-bottom:6px}
+.brand-tile[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+
+/* Barra de búsqueda fija */
+.bar{position:sticky;top:0;z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid transparent;transition:box-shadow 200ms ease,border-color 200ms ease;margin-top:14px}
+.bar.scrolled{border-bottom-color:var(--glass-edge);box-shadow:0 10px 24px -16px rgba(0,0,0,.35)}
+.bar:has(.filters-wrap.open){position:relative}
+.bar .wrap{padding-top:12px;padding-bottom:10px;display:flex;flex-direction:column;gap:10px}
+.search-row{display:flex;gap:8px}
+.search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:0 14px;box-shadow:var(--shadow)}
+.search svg{flex:none;color:var(--muted)}
+.search input{flex:1;border:0;background:transparent;padding:12px 0;outline:none;min-width:0;font-size:16px}
+.search:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+.btn-filter{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:0 14px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+.btn-filter .dot{min-width:20px;height:20px;border-radius:999px;background:var(--brand);color:var(--brand-ink);font-size:12px;display:none;align-items:center;justify-content:center;padding:0 6px}
+.btn-filter.on .dot{display:inline-flex}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip small{color:var(--muted);font-weight:500;margin-left:4px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"] small{color:inherit;opacity:.75}
+.active-filters{display:flex;gap:6px;flex-wrap:wrap}
+.active-filters:empty{display:none}
+.af{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:13px;border-radius:999px;padding:5px 10px;cursor:pointer}
+
+/* Panel de filtros */
+.filters-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows 320ms cubic-bezier(.2,.8,.2,1)}
+.filters-wrap.open{grid-template-rows:1fr}
+.filters-wrap>.clip{overflow:hidden;min-height:0}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:600;cursor:pointer;touch-action:manipulation;transition:transform 100ms ease-out,background-color 150ms ease,color 150ms ease}
+.pill:active{transform:scale(.95)}
+.pill[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.pill small{opacity:.7;font-weight:500;margin-left:3px}
+.filters{display:grid;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;gap:16px;grid-template-columns:1fr;box-shadow:var(--shadow);margin-bottom:2px;opacity:0;transform:translateY(-6px);transition:opacity 220ms ease,transform 320ms cubic-bezier(.2,.8,.2,1)}
+.filters-wrap.open .filters{opacity:1;transform:none}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.field select,.field input[type=number]{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 10px;min-width:0;width:100%}
+.field input[type=range]{accent-color:var(--brand);width:100%}
+.range-val{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--bg);padding:9px 6px;cursor:pointer;font-size:14px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.reset{justify-self:start;border:1px solid var(--line);background:transparent;border-radius:10px;padding:10px;cursor:pointer;font-weight:600}
+
+/* Resumen y grilla */
+.summary{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 0 10px}
+.summary p{margin:0;color:var(--muted);font-size:14px}
+.sort{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.sort select{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 8px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;padding-bottom:28px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform 160ms ease-out,box-shadow 200ms ease}
+.card:has(.card-img:active){transform:scale(.985)}
+@media (hover:hover){.card:hover{box-shadow:0 2px 4px rgba(20,20,20,.06),0 12px 28px rgba(20,20,20,.1)}}
+.card-img{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--bg),var(--surface));display:flex;align-items:center;justify-content:center;border:0;border-bottom:1px solid var(--line);color:var(--muted);cursor:pointer;width:100%;padding:0}
+.card-img svg{width:58%;height:auto;opacity:.55}
+.badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.01em}
+.badge.stock{background:var(--ok-soft);color:var(--ok)}
+.badge.order{background:var(--wait-soft);color:var(--wait)}
+.badge.new{background:var(--new-soft);color:var(--new)}
+.badge.last{background:var(--brand-soft);color:var(--brand)}
+.fav{position:absolute;top:8px;right:8px;width:38px;height:38px;border-radius:50%;border:0;background:var(--glass-strong);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.fav svg{width:19px;height:19px}
+.fav[aria-pressed="true"]{color:var(--brand)}
+.fav[aria-pressed="true"] svg path{fill:currentColor}
+.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.card h2{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1.05;margin:0;text-transform:uppercase;overflow-wrap:anywhere}
+.specs{display:flex;gap:6px;flex-wrap:wrap}
+.spec{font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+.colors{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:18px}
+.sw{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.18);flex:none}
+.more{font-size:12px;color:var(--muted)}
+.price small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.price b{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.01em}
+.price em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
+.price-row{margin-top:auto;padding-top:6px}
+.actions{display:flex;gap:8px}
+.wa{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:999px;padding:9px 13px;white-space:nowrap;border:0;cursor:pointer}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 12px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.primary{border:0;background:var(--brand);color:var(--brand-ink);border-radius:999px;padding:11px 14px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.empty{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+
+/* Bandeja flotante: "Me interesa" y comparar */
+.tray{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);z-index:30;display:none;gap:8px;align-items:center;background:var(--ink);color:var(--bg);border-radius:999px;padding:6px 6px 6px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:calc(100% - 32px)}
+.tray.on{display:flex;animation:trayIn 260ms cubic-bezier(.2,.9,.3,1.2)}
+@keyframes trayIn{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.tray span{font-size:14px;font-weight:600;white-space:nowrap}
+.tray button,.tray a{text-decoration:none;border:0;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.tray .t-wa{background:var(--wa);color:#fff}
+.tray .t-cmp{background:var(--bg);color:var(--ink)}
+.tray .t-x{background:transparent;color:var(--bg);opacity:.75;padding:8px}
+
+/* Tiendas */
+.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding-bottom:20px}
+.store{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);overflow:hidden;text-align:left;cursor:pointer;padding:0;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform 160ms ease-out}
+.store:active{transform:scale(.985)}
+.store-photo{aspect-ratio:16/8;background:linear-gradient(135deg,var(--brand),#7d0d11);position:relative;color:#fff;display:flex;align-items:flex-end;padding:12px}
+.store-photo::before{content:"";position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.18) 25%,transparent 0 50%,rgba(0,0,0,.18) 0 75%,transparent 0) 0 0/28px 28px;opacity:.5}
+.store-photo b{position:relative;font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase}
+.store-photo small{position:absolute;top:12px;left:12px;font-size:12px;font-weight:700;background:rgba(0,0,0,.28);padding:3px 8px;border-radius:999px}
+.store-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.store-body .addr{font-weight:700}
+.store-body .ref{color:var(--muted);font-size:14px}
+.store-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.hours-card{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin:0 0 14px;box-shadow:var(--shadow)}
+.hours-card b{display:block}
+.hours-card span{color:var(--muted);font-size:14px}
+.photo-ph{aspect-ratio:16/9;border-radius:12px;background:repeating-linear-gradient(135deg,var(--bg) 0 12px,var(--surface) 12px 24px);border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;text-align:center;padding:12px}
+.locales{display:flex;flex-direction:column;gap:8px}
+.local{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.local b{display:block}
+.local span{color:var(--muted);font-size:14px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wa-list{display:flex;flex-direction:column;gap:8px}
+.wa-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none}
+.wa-item b{display:block;font-size:15px}
+.wa-item span{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.wa-item i{font-style:normal;background:var(--wa);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:6px 11px;flex:none}
+
+/* Financiamiento */
+.fin-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.fin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.fin-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fin-sum div{background:var(--bg);border-radius:10px;padding:10px}
+.fin-sum small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.fin-sum b{font-variant-numeric:tabular-nums;font-size:17px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.plan{border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;background:var(--surface)}
+.plan.best{border-color:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.plan .tag{position:absolute;top:-10px;right:10px;background:var(--ok);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px}
+.plan h4{margin:0;font-family:var(--font-display);font-size:22px;text-transform:uppercase}
+.plan .wk{font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1.05;letter-spacing:-.01em}
+.plan .wk small{font-family:var(--font-body);font-size:13px;color:var(--muted);font-weight:600;letter-spacing:0}
+.plan dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:8px 0 0;font-size:13px}
+.plan dt{color:var(--muted)}
+.plan dd{margin:0;font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0}
+.warn{color:var(--wait);font-weight:600;font-size:13px}
+
+/* Contacto y preguntas */
+.faq{display:flex;flex-direction:column;gap:8px;padding-bottom:24px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
+.faq summary{cursor:pointer;list-style:none;padding:13px 0;font-weight:700;display:flex;justify-content:space-between;gap:10px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted);transition:transform 200ms ease}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{margin:0 0 14px;color:var(--muted);font-size:15px}
+
+/* Hoja inferior */
+.modal{position:fixed;inset:0;z-index:60;display:none}
+.modal.open{display:block}
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0}
+.sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;background:var(--surface);width:100%;max-width:560px;max-height:90%;overflow:auto;overscroll-behavior:contain;border-radius:22px 22px 0 0;padding:8px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;box-shadow:0 -12px 40px rgba(0,0,0,.28);will-change:transform;transform:translateY(100%)}
+.drag-zone{touch-action:none;cursor:grab;display:flex;flex-direction:column;gap:6px;user-select:none;-webkit-user-select:none;position:sticky;top:-8px;background:var(--surface);z-index:2;padding-top:8px;margin-top:-8px}
+.grabber{width:40px;height:5px;border-radius:3px;background:var(--line);margin:2px auto 4px}
+@media (min-width:640px){
+  .sheet{top:50%;bottom:auto;left:50%;right:auto;margin:0;width:min(600px,calc(100% - 32px));border-radius:22px;padding:18px 20px 22px;box-shadow:0 30px 80px rgba(0,0,0,.35);transform:translate(-50%,-50%)}
+  .grabber{display:none}
+  .drag-zone{cursor:default;touch-action:auto;top:-18px;padding-top:18px;margin-top:-18px}
+}
+.sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.sheet h3{font-family:var(--font-display);font-size:30px;line-height:1;margin:4px 0 0;text-transform:uppercase;overflow-wrap:anywhere;text-wrap:balance}
+.close{border:1px solid var(--line);background:transparent;border-radius:999px;width:38px;height:38px;cursor:pointer;flex:none;font-size:20px;line-height:1}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:15px}
+.dl dt{color:var(--muted);font-weight:600}
+.dl dd{margin:0}
+.color-list{display:flex;flex-wrap:wrap;gap:6px}
+.color-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 5px;font-size:13px}
+.sheet .wa,.sheet .primary{padding:13px;font-size:16px}
+.cmp{overflow-x:auto}
+.cmp table{border-collapse:collapse;width:100%;font-size:14px;min-width:420px}
+.cmp th,.cmp td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+.cmp thead th{font-family:var(--font-display);font-size:18px;text-transform:uppercase;line-height:1.05}
+.cmp tbody th{color:var(--muted);font-weight:600;white-space:nowrap}
+.cmp td.num{font-variant-numeric:tabular-nums;font-weight:700}
+
+/* Barra de pestañas */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--glass-strong);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);border-top:1px solid var(--glass-edge);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar nav{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tabbar-h)}
+.tab{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none;letter-spacing:.01em}
+.tab svg{width:24px;height:24px}
+.tab[aria-current="page"]{color:var(--brand)}
+
+/* Aviso breve */
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-120%);z-index:80;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform 320ms cubic-bezier(.2,.9,.3,1)}
+.toast.on{transform:translate(-50%,0)}
+
+/* Pie */
+.foot{color:var(--muted);font-size:12px;text-align:center;padding:10px 16px 20px}
+
+/* Respuesta inmediata al tocar */
+button,a,.chip,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.chip,.wa,.ghost,.primary,.btn-filter,.seg button,.reset,.close,.type-tile,.brand-tile,.fav,.tab,.af,.tray button,.wa-item{transition:transform 100ms ease-out,background-color 150ms ease,color 150ms ease}
+.chip:active,.wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active{transform:scale(.95)}
+
+@media (max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .card-img{aspect-ratio:4/3}
+  .card-body{padding:10px 10px 12px;gap:6px}
+  .card h2{font-size:18px}
+  .meta{font-size:10.5px}
+  .price b{font-size:22px}
+  .actions{flex-direction:column}
+  .actions .wa,.actions .ghost{width:100%;padding:8px 10px;font-size:13px}
+  .brand b{font-size:26px}
+  .btn-filter .lbl-txt{display:none}
+  .badge{font-size:10.5px}
+  .fin-sum b{font-size:15px}
+  .type-tile{aspect-ratio:16/9;padding:10px}
+  .type-tile b{font-size:17px;overflow-wrap:anywhere}
+  .type-tile svg{width:62%;top:4%}
+}
+@media (prefers-reduced-transparency: reduce){
+  .bar{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .tabbar{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-contrast: more){
+  .bar,.tabbar{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .card,.chip,.search,.btn-filter,.filters,.store,.plan{border-color:var(--ink)}
+}
+@media (prefers-reduced-motion: reduce){
+  *{scroll-behavior:auto!important;animation:none!important}
+  .chip:active,.wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.card:has(.card-img:active),.store:active{transform:none}
+  .filters{transform:none!important}
+  .toast{transition:opacity 150ms ease}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="checker" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="brand">
+      <b>Malhuayza Motors</b>
+      <span>Motos, scooters, trimotos y cuatrimotos · Huamanga, Ayacucho</span>
+    </div>
+    <span class="open-pill" id="openPill"><i aria-hidden="true"></i><span id="openTxt">Lun–Sáb, 8 a. m. – 7 p. m.</span></span>
+  </div>
+</header>
+
+<!-- ============ CATÁLOGO ============ -->
+<section class="view" id="v-catalogo" aria-labelledby="t-catalogo">
+  <h1 class="sr" id="t-catalogo">Catálogo</h1>
+  <div class="wrap block">
+    <div class="block-head"><div><h2 class="section-title">Marcas</h2></div></div>
+    <div class="brands" id="brands" role="group" aria-label="Filtrar por marca"></div>
+  </div>
+  <div class="wrap block">
+    <div class="block-head"><div><h2 class="section-title">Explora por tipo</h2><p class="section-sub">Puedes elegir varios.</p></div></div>
+    <div class="types" id="types"></div>
+  </div>
+
+  <div class="bar" id="bar">
+    <div class="wrap">
+      <div class="search-row">
+        <label class="search" for="q">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="search" placeholder="Busca por modelo, marca o tipo" autocomplete="off" aria-label="Buscar en el catálogo">
+        </label>
+        <button class="btn-filter" id="toggleFilters" type="button" aria-label="Filtros" aria-expanded="false" aria-controls="filtersWrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <span class="lbl-txt">Filtros</span> <span class="dot" id="filterCount">0</span>
+        </button>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Tipo de vehículo"></div>
+      <div class="active-filters" id="activeFilters"></div>
+      <div class="filters-wrap" id="filtersWrap" inert><div class="clip">
+        <div class="filters">
+          <div class="field">
+            <span class="lbl" id="brandLbl">Marca <span class="more">· elige una o varias</span></span>
+            <div class="pills" id="fBrands" role="group" aria-labelledby="brandLbl"></div>
+          </div>
+          <div class="field">
+            <span class="lbl" id="ccLbl">Cilindrada</span>
+            <div class="pills" id="fCcs" role="group" aria-labelledby="ccLbl">
+              <button class="pill" type="button" data-v="0-125" aria-pressed="false">Hasta 125cc</button>
+              <button class="pill" type="button" data-v="126-175" aria-pressed="false">150 – 175cc</button>
+              <button class="pill" type="button" data-v="176-200" aria-pressed="false">200cc</button>
+              <button class="pill" type="button" data-v="201-250" aria-pressed="false">250cc</button>
+              <button class="pill" type="button" data-v="251-9999" aria-pressed="false">300cc a más</button>
+              <button class="pill" type="button" data-v="el" aria-pressed="false">Eléctricas</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="lbl" id="availLbl">Disponibilidad</span>
+            <div class="pills" id="fAvail" role="group" aria-labelledby="availLbl">
+              <button class="pill" type="button" data-v="stock" aria-pressed="false">En tienda</button>
+              <button class="pill" type="button" data-v="order" aria-pressed="false">A pedido</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fPrice">Precio máximo: <span class="range-val" id="fPriceVal"></span></label>
+            <input id="fPrice" type="range" min="3000" max="23000" step="500">
+          </div>
+          <button class="reset" id="reset" type="button">Limpiar filtros</button>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="summary">
+      <div>
+        <h2 class="section-title" id="heading">Todo el catálogo</h2>
+        <p id="count"></p>
+      </div>
+      <label class="sort" for="sort">Ordenar
+        <select id="sort">
+          <option value="type">Por tipo</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+          <option value="new">Nuevos ingresos</option>
+          <option value="cc">Cilindrada</option>
+          <option value="name">Nombre (A–Z)</option>
+        </select>
+      </label>
+    </div>
+    <div class="grid" id="grid" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ TIENDAS ============ -->
+<section class="view" id="v-tiendas" aria-labelledby="t-tiendas">
+  <div class="wrap block">
+    <div class="block-head"><div>
+      <h1 class="section-title" id="t-tiendas">Nuestras tiendas</h1>
+      <p class="section-sub">5 locales en 3 sedes de Huamanga. Toca una sede para ver cómo llegar.</p>
+    </div></div>
+    <div class="hours-card">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <div><b>Lunes a sábado, de 8:00 a. m. a 7:00 p. m.</b><span id="openTxt2">Mismo horario en todas las sedes</span></div>
+    </div>
+    <div class="stores" id="stores"></div>
+  </div>
+</section>
+
+<!-- ============ FINANCIAMIENTO ============ -->
+<section class="view" id="v-financiamiento" aria-labelledby="t-fin">
+  <div class="wrap block">
+    <div class="block-head"><div>
+      <h1 class="section-title" id="t-fin">Calcula tus cuotas</h1>
+      <p class="section-sub">Simulación aproximada con financiamiento Global Go. Pagos semanales a 12, 18 o 24 meses.</p>
+    </div></div>
+    <div class="fin-card">
+      <div class="fin-grid">
+        <div class="field">
+          <label for="finModel">Vehículo</label>
+          <select id="finModel"></select>
+        </div>
+        <div class="field" id="finPriceField" hidden>
+          <label for="finPrice">Precio del vehículo (S/)</label>
+          <input id="finPrice" type="number" inputmode="numeric" min="2000" step="50" value="5000">
+        </div>
+        <div class="field">
+          <span class="lbl" id="soatLbl">SOAT</span>
+          <div class="seg" role="group" aria-labelledby="soatLbl" id="finSoat">
+            <button type="button" data-v="0" aria-pressed="true">Sin SOAT</button>
+            <button type="button" data-v="1" aria-pressed="false">SOAT incluido</button>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="finInit">Tu cuota inicial: <span class="range-val" id="finInitVal"></span> <span id="finInitPct" class="more"></span></label>
+        <input id="finInit" type="range" step="10">
+        <span class="more" id="finInitMin"></span>
+      </div>
+      <div class="fin-sum">
+        <div><small>Precio</small><b id="sumPrice">–</b></div>
+        <div><small>Inicial</small><b id="sumInit">–</b></div>
+        <div><small>A financiar</small><b id="sumFin">–</b></div>
+      </div>
+      <div class="plans" id="plans"></div>
+      <p class="note">Montos referenciales calculados a partir de simulaciones reales de Global Go. La cuota final la define tu evaluación crediticia. Pagas cada semana y puedes adelantar el pago del mes completo.</p>
+      <button class="wa" id="finWa" type="button">Solicitar evaluación por WhatsApp</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACTO ============ -->
+<section class="view" id="v-contacto" aria-labelledby="t-contacto">
+  <div class="wrap block">
+    <div class="block-head"><div>
+      <h1 class="section-title" id="t-contacto">Escríbenos</h1>
+      <p class="section-sub">Te respondemos por WhatsApp de lunes a sábado, de 8 a. m. a 7 p. m.</p>
+    </div></div>
+    <div class="wa-list" id="contactList"></div>
+  </div>
+  <div class="wrap block">
+    <div class="block-head"><div><h2 class="section-title">Preguntas frecuentes</h2></div></div>
+    <div class="faq">
+      <details><summary>¿Puedo comprar en cuotas?</summary><p>Sí, con financiamiento Global Go. Das una cuota inicial (desde el 20 % del precio, aproximadamente) y pagas semanalmente a 12, 18 o 24 meses. También puedes adelantar y pagar el mes completo. Usa la pestaña Financiamiento para calcular tu cuota aproximada.</p></details>
+      <details><summary>¿Qué opción de financiamiento conviene más?</summary><p>A 12 meses pagas una cuota más alta, pero es la opción con menos intereses en total. A 18 y 24 meses la cuota baja, pero el total pagado sube.</p></details>
+      <details><summary>¿El SOAT está incluido?</summary><p>Puedes elegir: incluirlo en el financiamiento o sacarlo por tu cuenta. Incluirlo sube un poco la cuota semanal.</p></details>
+      <details><summary>¿Cuánto demora la placa y la tarjeta de propiedad?</summary><p>Te enviamos la Tarjeta de Propiedad Virtual (TIVE) en PDF; guárdala en Google Drive, iCloud o tu correo. Nosotros hacemos el trámite de la placa y la recogemos por ti: está lista en unos 7 días hábiles en nuestra tienda de Jr. Américo Oré 155.</p></details>
+      <details><summary>¿Dónde veo todos los colores de una moto?</summary><p>En la tienda de Av. La Victoria 268 (a espaldas del Plaza Vea) tenemos más espacio y la mayoría de colores disponibles. En las otras sedes exhibimos un modelo de cada uno.</p></details>
+      <details><summary>¿Tienen repuestos y taller?</summary><p>Sí. Repuestos y accesorios en la tienda principal (Jr. Américo Oré 155) y taller al frente, en Jr. Américo Oré 145. Escribe al WhatsApp de repuestos y taller para agendar tu mantenimiento.</p></details>
+      <details><summary>¿Qué significa “A pedido”?</summary><p>El modelo no está ahora en tienda, pero lo pedimos para ti. Escríbenos y te confirmamos el tiempo de llegada.</p></details>
+    </div>
+  </div>
+</section>
+
+<p class="foot">Precios de lista en soles, sujetos a cambio sin previo aviso. Stock referencial.</p>
+
+<div class="tray" id="tray" role="region" aria-label="Motos seleccionadas">
+  <span id="trayTxt"></span>
+  <button class="t-cmp" id="trayCmp" type="button">Comparar</button>
+  <button class="t-wa" id="trayWa" type="button">Enviar</button>
+  <button class="t-x" id="trayX" type="button" aria-label="Quitar selección">✕</button>
+</div>
+
+<div class="tabbar">
+  <nav aria-label="Menú principal">
+    <a class="tab" href="#catalogo" data-view="catalogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Catálogo</a>
+    <a class="tab" href="#tiendas" data-view="tiendas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Tiendas</a>
+    <a class="tab" href="#financiamiento" data-view="financiamiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>Financiamiento</a>
+    <a class="tab" href="#contacto" data-view="contacto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z"/></svg>Contacto</a>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal" id="modal">
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle"></div>
+</div>
+
+<script>
+/* ================= CONFIGURACIÓN ================= */
+/* Números que aparecen al tocar "Consultar" (código de país + número, sin espacios). Se muestran solo como "Contacto". */
+const SALES = ["51989005413","51941052030"];
+const WHATSAPP = SALES[0];
+
+/* Logos de marca: cuando subas los archivos a la carpeta img/marcas/ escribe aquí la ruta, ej. JCH:"img/marcas/jch.png" */
+const BRAND_LOGO = {};
+
+/* Fórmula aproximada de Global Go, ajustada con 5 simulaciones reales (error máximo ±S/1.50).
+   cuota semanal = a + b × monto financiado + c × precio del vehículo */
+const GG = {
+  "0":{12:[3.9233,0.027714,0.000603],18:[2.7599,0.021266,0.000665],24:[2.1478,0.018229,0.000696]},
+  "1":{12:[15.1998,0.027038,0.000730],18:[11.4558,0.020741,0.000769],24:[9.5724,0.017738,0.000826]}
+};
+const MIN_INIT = 0.20;         // cuota inicial mínima (20 % del precio)
+const NEW_DAYS = 30;           // días que un modelo se marca como "Nuevo ingreso"
+
+const STORES = [
+  {id:"americo-ore", name:"Sede Américo Oré", tag:"Tienda principal · 3 locales",
+   addr:"Jr. Américo Oré 155", ref:"A 1 cuadra de la SUNAT",
+   locales:[["Tienda de vehículos y repuestos (2 tiendas)","Jr. Américo Oré 155 · Exhibimos un modelo de cada vehículo, más repuestos y accesorios."],
+            ["Taller","Jr. Américo Oré 145 · Al frente de la tienda principal. Mantenimiento y reparación."]],
+   tags:["Vehículos","Repuestos","Taller"],
+   wa:[["Contacto","51989005413"],["Contacto","51941052030"],["Repuestos y taller","51948741018"],["Gerencia","51948507711"]],
+   maps:"https://maps.app.goo.gl/V3395DavFnwm31cu5"},
+  {id:"la-victoria", name:"Sede La Victoria", tag:"La mayor exhibición",
+   addr:"Av. La Victoria 268", ref:"A espaldas del Plaza Vea",
+   locales:[["Tienda de vehículos","Nuestro local más amplio: más vehículos y la mayoría de colores disponibles."]],
+   tags:["Vehículos","Todos los colores"],
+   wa:[["Contacto","51989005413"],["Contacto","51941052030"]],
+   maps:"https://maps.app.goo.gl/YJgvNwH38XU1tKJh9"},
+  {id:"mariscal-caceres", name:"Sede Mariscal Cáceres", tag:"Vehículos",
+   addr:"Av. Mariscal Cáceres 509", ref:"A una cuadra del Parque Magdalena",
+   locales:[["Tienda de vehículos","Exhibimos un modelo de cada vehículo."]],
+   tags:["Vehículos"],
+   wa:[["Contacto","51941052030"],["Contacto","51989005413"]],
+   maps:"https://maps.app.goo.gl/1VoGaHgZTuB11uBL7"}
+];
+const CONTACTS = [
+  ["Contacto","51989005413","Vehículos y financiamiento"],
+  ["Contacto","51941052030","Vehículos y financiamiento"],
+  ["Repuestos y taller","51948741018","Jr. Américo Oré 155 y 145"],
+  ["Gerencia","51948507711","Malhuayza Motors"]
+];
+
+/* Datos de la hoja "Catálogo Vendedores - Malhuayza Motors" (12/11/2026).
+   [marca, modelo, tipo, cilindrada, colores, unidades en tienda (0 = a pedido), precio lista, nota, último ingreso] */
+const RAW = [
+["JCH","HAWK 150","Cuatrimoto","150cc","NEGRO",1,7650,"","07/08/2026"],
+["JCH","HUNTER 150","Cuatrimoto","150cc","BLANCO",1,7400,"","07/08/2026"],
+["JCH","X-CROSS 300","Cuatrimoto","300cc","ROJO",1,15900,"","07/08/2026"],
+["DAVEST","CUATRIMOTO VRX125","Cuatrimoto","125cc","ROJO",1,5500,"","28/01/2025"],
+["CROSS","ATV 250 WORK TRAK","Cuatrimoto","250cc","NEGRO",1,12000,"","22/09/2025"],
+["QINGQI","LIGER 200","Todoterreno","200cc","BLANCO,NEGRO",4,9300,"","03/01/2022"],
+["QINGQI","QM200GY","Todoterreno","200cc","AZUL,ROJO,NEGRO",4,8500,"","03/01/2022"],
+["MOTOFOX","MEGAN 175","Trimoto pasajero","175cc","VERDE GRIS",1,7700,"","29/10/2026"],
+["ADVANCE","RINO 350 TOLVA ALTA","Cuatricarga","350cc","",0,20000,"",""],
+["ADVANCE","ADELI 175","Scooter","175cc","NEGRO,AZUL,VERDE,MORADO",5,5700,"","29/10/2026"],
+["SHENGLI","SL250ZH-1","Trimoto carga","250cc","",0,11650,"",""],
+["SHENGLI","SL300ZH-1","Trimoto carga","300cc","",0,13950,"",""],
+["JCH","ENJOY V2","Scooter","150cc","ROJO NEGRO,NEGRO MATE,PLATA NEGRO,AZUL NEGRO",7,5450,"","31/10/2026"],
+["JCH","KALLPA","Scooter","150cc","NEGRO,AZUL,GRIS,ROJO",4,5200,"","31/10/2026"],
+["JCH","STYLE V2","Scooter","150cc","NEGRO,AZUL,GRIS,BLANCO,ROJO",10,3800,"","31/10/2026"],
+["JCH","URBAN T29","Scooter","150cc","AZUL,BLANCO",2,4000,"","21/02/2025"],
+["JCH","VOLT","Scooter","150cc","MORADO",1,3650,"","20/06/2025"],
+["JCH","VOLT V2","Scooter","150cc","ROJO,ROSADO,BLANCO,GRIS",5,3800,"","28/08/2026"],
+["JCH","STREET ADV 175","Scooter","175cc","NEGRO,GRIS NEGRO,BLANCO,VERDE AZUL",5,6850,"","20/10/2026"],
+["JCH","CLICK 150 PRO C/R","Trimoto pasajero","150cc","NEGRO,BLANCO,AZUL,GRIS",6,5350,"","30/09/2026"],
+["JCH","ONE","Semiautomática","125cc","MORADO,NEGRO,PLATA,ROJO",0,3750,"",""],
+["JCH","SUNNY","Semiautomática","125cc","AZUL,BLANCO AMARILLO,BLANCO AZUL,GRIS,NEGRO AMARILLO,NEGRO VERDE,ROJO",0,3850,"",""],
+["JCH","FALKON","Utilitaria","150cc","NEGRO ROJO",1,4200,"","28/08/2026"],
+["JCH","MAX 150","Urbana","150cc","NEGRO AMARILLO,NEGRO VERDE",0,4550,"",""],
+["JCH","TARKI 150","Utilitaria","150cc","NEGRO,ROJO",2,3600,"","19/12/2025"],
+["JCH","WORK 150","Utilitaria","150cc","GRIS",1,3550,"","09/05/2026"],
+["JCH","WORKMAN V2","Todoterreno","150cc","NEGRO AZUL,NEGRO AMARILLO,NEGRO ANARANJADO,NEGRO DORADO,NEGRO ROJO",0,4550,"",""],
+["JCH","MAX 200","Urbana","200cc","NEGRO ROJO",1,4550,"","09/05/2026"],
+["JCH","MONTANA","Todoterreno","200cc","NEGRO ROJO,NEGRO VERDE,AMARILLO,ROJO,ANARANJADO,VERDE,DORADO",2,4600,"","31/10/2026"],
+["JCH","MRX200 PRO","Todoterreno","200cc","NEGRO AMARILLO,BLANCO ROJO,NEGRO BLANCO,ROJO BLANCO,ROJO,NEGRO ROJO",0,4700,"",""],
+["JCH","MT200","Pistera","200cc","AZUL,PLATA,NEGRO,GRIS",4,5750,"","31/10/2026"],
+["JCH","NITROX 200","Pistera","200cc","NEGRO ANARANJADO,NEGRO VERDE",2,4900,"","22/09/2025"],
+["JCH","NK200","Pistera","200cc","NEGRO AZUL,NEGRO ROJO",2,6550,"","30/03/2026"],
+["JCH","R6 200","Pistera","200cc","AZUL,NEGRO ROJO,NEGRO DORADO,NEGRO GRIS",0,7300,"",""],
+["JCH","RIDER 200","Pistera","200cc","NEGRO ROJO",1,7200,"","30/03/2026"],
+["JCH","SPORT 250 4V","Pistera","200cc","GRIS VERDE,ROJO NEGRO,NEGRO ROJO,BLANCO ROJO",0,10250,"",""],
+["JCH","TARKI 200","Utilitaria","200cc","ROJO",1,3750,"","19/12/2025"],
+["JCH","TITAN","Todoterreno","200cc","NEGRO,BLANCO,AZUL,ROJO",2,4400,"","31/10/2026"],
+["JCH","TORNADO V2","Todoterreno","200cc","NEGRO AMARILLO,NEGRO ANARANJADO,NEGRO GRIS,NEGRO ROJO,BLANCO NEGRO",0,4500,"",""],
+["JCH","TRACKER","Todoterreno","200cc","NEGRO ANARANJADO",2,5100,"","28/08/2026"],
+["JCH","ARIZONA 250","Todoterreno","250cc","",0,6500,"",""],
+["JCH","CROSS MAX 250PRO","Todoterreno","250cc","NEGRO ANARANJADO,NEGRO DORADO,NEGRO GRIS,NEGRO ROJO",4,5350,"","28/08/2026"],
+["JCH","GS250","Todoterreno","250cc","NEGRO BLANCO,NEGRO",2,9750,"","28/08/2026"],
+["JCH","INDIAN 250","Custom","250cc","AMARILLO NEGRO,VERDE NEGRO",3,6850,"","08/09/2026"],
+["JCH","MAMBA 250","Pistera","250cc","ROJO GRIS",0,7950,"",""],
+["JCH","RZ8B","Pistera","250cc","AZUL BLANCO,BLANCO CELESTE,NEGRO ANARANJADO,NEGRO CELESTE,NEGRO MORADO,NEGRO VERDE",0,8150,"",""],
+["JCH","TRAVEL 250 EVO","Todoterreno","250cc","ANARANJADO NEGRO,ROJO",0,7400,"",""],
+["JCH","X-DRIVE 250","Pistera","250cc","GRIS AMARILLO,GRIS ROJO",2,7550,"","05/11/2026"],
+["JCH","DISCOVERY","Aventura","300cc","",0,10850,"",""],
+["JCH","MAMBA 300","Pistera","300cc","ROJO GRIS",0,8250,"",""],
+["JCH","TRAVEL 300","Todoterreno","300cc","BLANCO ANARANJADO,GRIS",2,7600,"","28/08/2026"],
+["STRONG","ST250ZH - PLUS","Trimoto carga","250cc","AZUL",1,9850,"","08/10/2026"],
+["STRONG","ST250ZH - STD","Trimoto carga","250cc","ROJO",1,9000,"","08/10/2026"],
+["STRONG","ST300ZH","Trimoto carga","300cc","ROJO",1,13300,"","25/09/2025"],
+["YANSUMI","YS350T2-PG DOBLE EJE","Cuatricarga","350cc","ROJO,AZUL",2,22950,"","15/06/2026"],
+["ARTSUN","300MAX1 GALLINERO S/PTA-LLANTON IMPORTADO","Trimoto carga","300cc","ROJO",1,15650,"","18/03/2025"],
+["ARTSUN","300MAX1 S/PTA-LLANTON (NEW)","Trimoto carga","300cc","AZUL",1,14100,"","06/05/2026"],
+["ARTSUN","JINGUAN S/C - AS300ZH-2B","Trimoto carga","300cc","ROJO",1,12700,"","28/08/2025"],
+["ARTSUN","TUBULAR 300 BUFALO LLANTON","Trimoto carga","300cc","ROJO,AZUL",2,14150,"","29/04/2025"],
+["ARTSUN","350MAX1 S/P LLANTON Y DOBLE","Trimoto carga","350cc","AZUL,ROJO",2,14650,"","28/10/2026"],
+["ARTSUN","XD 1000W","Eléctrica","1000W","AZUL",1,3850,"","20/03/2026"],
+["ARTSUN","Q6 1200W","Eléctrica","1200W","MORADO",1,4750,"","20/03/2026"],
+["ARTSUN","MAXXIS FULL","Semiautomática","110cc","GRIS",1,4000,"","11/08/2025"],
+["ARTSUN","SPEED150","Pistera","150cc","AZUL",1,3650,"","02/06/2026"],
+["ARTSUN","AS200-E","Todoterreno","200cc","ROJO",1,4450,"","02/06/2026"],
+["ARTSUN","GRAND TK-250 4 VAL 6 CAMBIOS","Todoterreno","250cc","BLANCO ANARANJADO,NEGRO ROJO,ANARANJADO NEGRO",3,7150,"","28/01/2026"],
+["ARTSUN","PHANTOM","Urbana","250cc","",0,7100,"",""],
+["ARTSUN","VULKAN 250","Todoterreno","250cc","NEGRO ANARANJADO",1,6500,"","02/12/2025"],
+["ARTSUN","ZR250 B. INVERTIDA","Todoterreno","250cc","ROJO BLANCO",1,5550,"","25/04/2026"],
+["SENKE","CHOPPER SK 150-8","Pistera","150cc","ROJO,AZUL,NEGRO",0,4850,"Año 2023/24",""],
+["SENKE","SHARK SK-150","Pistera","150cc","GRIS,NARANJA,VERDE,NEGRO",0,5950,"Año 2026",""],
+["SENKE","SHARK SK-200","Pistera","200cc","GRIS,NARANJA,VERDE",0,6150,"Año 2026",""],
+["SENKE","SK200-10A RAPTOR CARBURADA","Urbana","200cc","ROJO",1,6900,"","09/05/2022"],
+["SENKE","SK200-10A RAPTOR INYECTADA","Urbana","200cc","ROJO,GRIS",0,7200,"Año 2023/24",""],
+["SENKE","SK250-K MONSTER","Urbana","250cc","",0,13560,"",""],
+["SENKE","T-LEOPARD 300","Pistera","300cc","AZUL",0,9150,"Año 2023/24",""],
+["SENKE","SK400-K","Urbana","400cc","NEGRO,GRIS,ROJO",1,18400,"","20/08/2023"],
+["SENKE","SK400-KG","Urbana","400cc","NEGRO,GRIS,AZUL",1,18400,"","20/08/2023"]
+];
+
+/* ================= DATOS DERIVADOS ================= */
+const TYPE_ORDER = ["Scooter","Pistera","Urbana","Todoterreno","Utilitaria","Semiautomática","Custom","Aventura","Eléctrica","Trimoto pasajero","Trimoto carga","Cuatrimoto","Cuatricarga"];
+const TYPE_LABEL = {"Scooter":"Scooters","Pistera":"Pisteras","Urbana":"Urbanas","Todoterreno":"Todoterreno","Utilitaria":"Utilitarias","Semiautomática":"Semiautomáticas","Custom":"Custom","Aventura":"Aventura","Eléctrica":"Eléctricas","Trimoto pasajero":"Trimotos pasajero","Trimoto carga":"Trimotos carga","Cuatrimoto":"Cuatrimotos","Cuatricarga":"Cuatricargas"};
+const TYPE_COLOR = {"Scooter":"#2c5ec9","Pistera":"#c4161c","Urbana":"#3b3f46","Todoterreno":"#7a5a1e","Utilitaria":"#2b7a4b","Semiautomática":"#6a3fb0","Custom":"#5a2a1a","Aventura":"#1d6b74","Eléctrica":"#0f8f7a","Trimoto pasajero":"#b4521a","Trimoto carga":"#8a1d22","Cuatrimoto":"#1f2a44","Cuatricarga":"#4a4f1a"};
+const COLOR_HEX = {NEGRO:"#17181a",BLANCO:"#f7f7f5",ROJO:"#d32027",AZUL:"#1f4fd6",GRIS:"#8b9098",PLATA:"#c4c8ce",VERDE:"#2f9e52",AMARILLO:"#f3c300",ANARANJADO:"#f27a12",NARANJA:"#f27a12",MORADO:"#7b3fb2",ROSADO:"#f39ac0",DORADO:"#c9a227",CELESTE:"#4cc3f2"};
+
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const parseDate = s => { if(!s) return null; const [d,m,y]=s.split("/").map(Number); return new Date(y,m-1,d); };
+const TODAY = new Date();
+
+const DATA = RAW.map((r,i)=>{
+  const [brand,model,type,cc,colors,stock,price,note,last]=r;
+  const ld=parseDate(last);
+  return {id:i,brand,model,type,cc,ccNum:parseInt(cc,10)||0,electric:/w$/i.test(cc),
+    colors:colors?colors.split(",").map(s=>s.trim()).filter(Boolean):[],
+    stock,price,note,last:ld,
+    isNew: !!ld && stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
+    isLast: stock===1,
+    key: slug(brand+" "+model),
+    text: norm(brand+" "+model+" "+type+" "+cc+" "+colors)};
+});
+const BY_KEY = Object.fromEntries(DATA.map(d=>[d.key,d]));
+
+const fmt = n => "S/ " + Math.round(n).toLocaleString("es-PE");
+const fmt2 = n => "S/ " + n.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
+const cap = s => s.charAt(0)+s.slice(1).toLowerCase();
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function swatch(name){
+  const parts = name.replace("MATE","").trim().split(/\s+/).map(w=>COLOR_HEX[w]).filter(Boolean);
+  if(!parts.length) return "";
+  const bg = parts.length>1 ? `linear-gradient(135deg,${parts[0]} 50%,${parts[1]} 50%)` : parts[0];
+  return `<span class="sw" style="background:${bg}" title="${cap(name)}"></span>`;
+}
+function icon(type){
+  const wheel=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="${x}" cy="${y}" r="${r/4}" fill="currentColor"/>`;
+  const st='fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"';
+  if(type.startsWith("Trimoto")) return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(40,82,20)}${wheel(150,82,20)}<rect x="105" y="20" width="85" height="45" rx="4" ${st}/><path d="M40 82 L62 40 H92 L105 62 M62 40 L55 25 H70" ${st}/></svg>`;
+  if(type.startsWith("Cuatri")) return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(42,80,24)}${wheel(158,80,24)}<path d="M30 55 H170 L155 35 H110 L100 20 M70 55 L80 35 H110" ${st}/></svg>`;
+  if(type==="Scooter"||type==="Eléctrica"||type==="Semiautomática") return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(45,82,20)}${wheel(158,82,20)}<path d="M45 82 H120 L135 50 H75 L70 65 M135 50 L150 22 H165 M158 82 L142 40" ${st}/></svg>`;
+  return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(42,80,24)}${wheel(160,80,24)}<path d="M42 80 L75 45 H120 L135 30 H150 M75 45 L95 80 H125 L145 45 L160 80 M88 45 L95 32 H125" ${st}/></svg>`;
+}
+const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>`;
+const wa = (num,msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+const msgMoto = d => `Hola Malhuayza Motors, me interesa la ${d.brand} ${d.model} (${fmt(d.price)}). ¿Me pueden dar más información?`;
+const fmtNum = n => n.slice(2).replace(/(\d{3})(\d{3})(\d{3})/,"$1 $2 $3");
+/* Hoja para elegir entre los números de "Contacto" */
+function contactSheet(msg,sub){
+  return `
+    <div class="drag-zone" id="dragZone">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div><div class="meta"><span>${sub?esc(sub):"WhatsApp"}</span></div><h3 id="mTitle">Elige un contacto</h3></div>
+        <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div class="wa-list">${SALES.map(n=>`<a class="wa-item" href="${wa(n,msg)}" target="_blank" rel="noopener"><div><b>Contacto</b><span>${fmtNum(n)}</span></div><i>Escribir</i></a>`).join("")}</div>
+    <p class="note">Te respondemos de lunes a sábado, de 8:00 a. m. a 7:00 p. m.</p>`;
+}
+const pageBase = () => location.href.split("#")[0];
+
+/* Horario: Lun–Sáb 8:00–19:00 hora de Lima (UTC−5) */
+function openStatus(){
+  const now=new Date(); const lima=new Date(now.getTime()+now.getTimezoneOffset()*6e4-5*36e5);
+  const d=lima.getDay(), h=lima.getHours()+lima.getMinutes()/60;
+  const open = d>=1&&d<=6&&h>=8&&h<19;
+  let txt;
+  if(open) txt = h>=18 ? "Abierto · cierra a las 7 p. m." : "Abierto ahora";
+  else if(d>=1&&d<=6&&h<8) txt="Cerrado · abre hoy a las 8 a. m.";
+  else txt = d===6||d===0 ? "Cerrado · abre el lunes a las 8 a. m." : "Cerrado · abre mañana a las 8 a. m.";
+  if(d===6&&h>=19) txt="Cerrado · abre el lunes a las 8 a. m.";
+  return {open,txt};
+}
+
+/* Almacenamiento local seguro (solo comodidad del visitante) */
+const store = {
+  get(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+
+/* ================= ESTADO ================= */
+const S = {q:"",types:new Set(),brands:new Set(),ccs:new Set(),avail:new Set(),max:23000,sort:"type"};
+const CC_LABEL = {"0-125":"Hasta 125cc","126-175":"150–175cc","176-200":"200cc","201-250":"250cc","251-9999":"300cc a más","el":"Eléctricas"};
+const AVAIL_LABEL = {stock:"En tienda",order:"A pedido"};
+const toggleIn = (set,v) => { set.has(v) ? set.delete(v) : set.add(v); return set.has(v); };
+let favs = new Set(store.get("mm-favs",[]).filter(k=>BY_KEY[k]));
+
+/* ================= CATÁLOGO ================= */
+function buildCatalogControls(){
+  const counts={};DATA.forEach(d=>counts[d.type]=(counts[d.type]||0)+1);
+  const types=TYPE_ORDER.filter(t=>counts[t]);
+  $("types").innerHTML = types.map(t=>`<button class="type-tile" type="button" data-t="${t}" aria-pressed="false" style="--tile:${TYPE_COLOR[t]}">${icon(t)}<b>${TYPE_LABEL[t]}</b><small>${counts[t]} modelo${counts[t]>1?"s":""}</small></button>`).join("");
+  $("chips").innerHTML = `<button class="chip" type="button" data-t="" aria-pressed="true">Todos<small>${DATA.length}</small></button>` +
+    types.map(t=>`<button class="chip" type="button" data-t="${t}" aria-pressed="false">${TYPE_LABEL[t]}<small>${counts[t]}</small></button>`).join("");
+  const bc={};DATA.forEach(d=>bc[d.brand]=(bc[d.brand]||0)+1);
+  const brands=Object.keys(bc).sort((a,b)=>bc[b]-bc[a]||a.localeCompare(b));
+  $("brands").innerHTML = brands.map(b=>{
+    const logo=BRAND_LOGO[b];
+    return `<button class="brand-tile${logo?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false"${logo?` style="background-image:url('${logo}')"`:""}><b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
+  }).join("");
+  $("fBrands").innerHTML = brands.slice().sort().map(b=>`<button class="pill" type="button" data-v="${b}" aria-pressed="false">${b}<small>${bc[b]}</small></button>`).join("");
+  const maxP=Math.ceil(Math.max(...DATA.map(d=>d.price))/500)*500;
+  $("fPrice").max=maxP;$("fPrice").value=maxP;S.max=maxP;
+}
+
+function filtered(){
+  const words=norm(S.q).split(/\s+/).filter(Boolean);
+  const list=DATA.filter(d=>{
+    if(S.types.size&&!S.types.has(d.type)) return false;
+    if(S.brands.size&&!S.brands.has(d.brand)) return false;
+    if(S.ccs.size&&![...S.ccs].some(r=>{
+      if(r==="el") return d.electric;
+      const [a,b]=r.split("-").map(Number); return !d.electric&&d.ccNum>=a&&d.ccNum<=b;
+    })) return false;
+    if(d.price>S.max) return false;
+    if(S.avail.size===1){ if(S.avail.has("stock")&&!d.stock) return false; if(S.avail.has("order")&&d.stock) return false; }
+    return words.every(w=>d.text.includes(w));
+  });
+  const by={
+    "type":(a,b)=>TYPE_ORDER.indexOf(a.type)-TYPE_ORDER.indexOf(b.type)||a.price-b.price,
+    "price-asc":(a,b)=>a.price-b.price,
+    "price-desc":(a,b)=>b.price-a.price,
+    "new":(a,b)=>(b.last?b.last.getTime():0)-(a.last?a.last.getTime():0),
+    "cc":(a,b)=>(a.electric-b.electric)||a.ccNum-b.ccNum||a.price-b.price,
+    "name":(a,b)=>a.model.localeCompare(b.model)
+  };
+  return list.sort(by[S.sort]);
+}
+function weeklyFrom(price){ const init=Math.ceil(price*MIN_INIT/10)*10; const c=GG["0"][24]; return c[0]+c[1]*(price-init)+c[2]*price; }
+
+function badgesHtml(d){
+  return `<span class="badge ${d.stock?"stock":"order"}">${d.stock?"En tienda":"A pedido"}</span>`+
+    (d.isNew?`<span class="badge new">Nuevo ingreso</span>`:"")+
+    (d.isLast?`<span class="badge last">Última unidad</span>`:"");
+}
+function card(d){
+  const sw=d.colors.slice(0,6).map(swatch).join("");
+  const more=d.colors.length>6?`<span class="more">+${d.colors.length-6}</span>`:"";
+  return `<article class="card">
+    <button class="card-img" type="button" data-open="${d.id}" aria-label="Ver detalle de ${esc(d.brand+" "+d.model)}">
+      ${icon(d.type)}<span class="badges">${badgesHtml(d)}</span>
+    </button>
+    <button class="fav" type="button" data-fav="${d.key}" aria-pressed="${favs.has(d.key)}" aria-label="Me interesa: ${esc(d.model)}">${heart}</button>
+    <div class="card-body">
+      <div class="meta"><span>${d.brand}</span><span>${d.type}</span></div>
+      <h2>${esc(d.model)}</h2>
+      <div class="specs"><span class="spec">${d.cc}</span>${d.note?`<span class="spec">${d.note}</span>`:""}</div>
+      <div class="colors">${sw||'<span class="more">Colores a consultar</span>'}${more}</div>
+      <div class="price-row"><div class="price"><small>Precio</small><b>${fmt(d.price)}</b><em>o desde ${fmt2(weeklyFrom(d.price))} por semana*</em></div></div>
+      <div class="actions">
+        <button class="wa" type="button" data-consult="${d.id}">Consultar</button>
+        <button class="ghost" type="button" data-open="${d.id}">Ver detalle</button>
+      </div>
+    </div>
+  </article>`;
+}
+function renderCatalog(){
+  const list=filtered();
+  $("grid").innerHTML = list.length ? list.map(card).join("") :
+    `<div class="empty"><b>No encontramos modelos con esos filtros</b>Prueba con otra palabra o toca “Limpiar filtros”.</div>`;
+  const tl=[...S.types].map(t=>TYPE_LABEL[t]), bl=[...S.brands];
+  const short=a=>a.length>2?`${a.slice(0,2).join(", ")} +${a.length-2}`:a.join(", ");
+  const parts=[short(tl),short(bl)].filter(Boolean);
+  $("heading").textContent = parts.length ? parts.join(" · ") : "Todo el catálogo";
+  const inStock=list.filter(d=>d.stock).length;
+  $("count").textContent = `${list.length} modelo${list.length===1?"":"s"} · ${inStock} en tienda · *cuota aprox. a 24 meses con 20 % de inicial`;
+  const active=S.brands.size+S.ccs.size+S.avail.size+(S.max<+$("fPrice").max?1:0);
+  $("filterCount").textContent=active;
+  $("toggleFilters").classList.toggle("on",active>0);
+  $("fPriceVal").textContent=fmt(S.max);
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",(c.dataset.t===""?S.types.size===0:S.types.has(c.dataset.t))?"true":"false"));
+  document.querySelectorAll(".type-tile").forEach(c=>c.setAttribute("aria-pressed",S.types.has(c.dataset.t)?"true":"false"));
+  document.querySelectorAll(".brand-tile").forEach(c=>c.setAttribute("aria-pressed",S.brands.has(c.dataset.b)?"true":"false"));
+  $("fBrands").querySelectorAll(".pill").forEach(c=>c.setAttribute("aria-pressed",S.brands.has(c.dataset.v)?"true":"false"));
+  $("fCcs").querySelectorAll(".pill").forEach(c=>c.setAttribute("aria-pressed",S.ccs.has(c.dataset.v)?"true":"false"));
+  $("fAvail").querySelectorAll(".pill").forEach(c=>c.setAttribute("aria-pressed",S.avail.has(c.dataset.v)?"true":"false"));
+  const af=[
+    ...[...S.types].map(v=>[`types:${v}`,TYPE_LABEL[v]]),
+    ...[...S.brands].map(v=>[`brands:${v}`,v]),
+    ...[...S.ccs].map(v=>[`ccs:${v}`,CC_LABEL[v]]),
+    ...[...S.avail].map(v=>[`avail:${v}`,AVAIL_LABEL[v]])
+  ].map(([k,l])=>`<button class="af" type="button" data-clear="${esc(k)}" aria-label="Quitar filtro ${esc(l)}">${esc(l)} ✕</button>`);
+  if(af.length>1) af.push(`<button class="af" type="button" data-clear="all">Quitar todos</button>`);
+  $("activeFilters").innerHTML=af.join("");
+}
+function scrollToResults(){
+  const y=$("bar").getBoundingClientRect().top+window.scrollY;
+  window.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+}
+
+/* ================= DETALLE DE MOTO ================= */
+function motoSheet(d){
+  const shareUrl = pageBase()+"#moto-"+d.key;
+  return `
+    <div class="drag-zone" id="dragZone">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div><div class="meta"><span>${d.brand} · ${d.type}</span></div><h3 id="mTitle">${esc(d.model)}</h3></div>
+        <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
+    <div class="price"><small>Precio de lista</small><b>${fmt(d.price)}</b><em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
+    <dl class="dl">
+      <dt>Marca</dt><dd>${d.brand}</dd>
+      <dt>Tipo</dt><dd>${d.type}</dd>
+      <dt>${d.electric?"Potencia":"Cilindrada"}</dt><dd>${d.cc}</dd>
+      <dt>Disponibilidad</dt><dd>${d.stock?`En tienda (${d.stock} ${d.stock===1?"unidad":"unidades"})`:"A pedido"}</dd>
+      ${d.note?`<dt>Modelo</dt><dd>${d.note}</dd>`:""}
+    </dl>
+    <div><div class="meta" style="margin-bottom:6px"><span>Colores</span></div>
+      <div class="color-list">${d.colors.length?d.colors.map(c=>`<span class="color-pill">${swatch(c)}${cap(c)}</span>`).join(""):'<span class="more">Consultar colores disponibles</span>'}</div>
+    </div>
+    <button class="wa" type="button" data-consult="${d.id}">Consultar por WhatsApp</button>
+    <div class="btn-row">
+      <button class="ghost" type="button" data-calc="${d.key}">Calcular cuotas</button>
+      <button class="ghost" type="button" data-fav-sheet="${d.key}" aria-pressed="${favs.has(d.key)}">${favs.has(d.key)?"✓ Me interesa":"♡ Me interesa"}</button>
+    </div>
+    <button class="ghost" type="button" data-copy="${esc(shareUrl)}">Copiar enlace de esta moto</button>`;
+}
+
+/* ================= TIENDAS ================= */
+function buildStores(){
+  $("stores").innerHTML = STORES.map(s=>`
+    <button class="store" type="button" data-store="${s.id}">
+      <div class="store-photo"><small>${s.tag}</small><b>${s.name}</b></div>
+      <div class="store-body">
+        <span class="addr">${s.addr}</span>
+        <span class="ref">${s.ref}</span>
+        <div class="store-tags">${s.tags.map(t=>`<span class="spec">${t}</span>`).join("")}</div>
+      </div>
+    </button>`).join("");
+}
+function storeSheet(s){
+  return `
+    <div class="drag-zone" id="dragZone">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div><div class="meta"><span>${s.tag}</span></div><h3 id="mTitle">${s.name}</h3></div>
+        <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div class="photo-ph">Fotos del local próximamente</div>
+    <dl class="dl">
+      <dt>Dirección</dt><dd><b>${s.addr}</b>, Huamanga</dd>
+      <dt>Referencia</dt><dd>${s.ref}</dd>
+      <dt>Horario</dt><dd>Lunes a sábado, 8:00 a. m. – 7:00 p. m.<br><span class="more">${openStatus().txt}</span></dd>
+    </dl>
+    <div class="locales">${s.locales.map(l=>`<div class="local"><b>${l[0]}</b><span>${l[1]}</span></div>`).join("")}</div>
+    <div class="btn-row">
+      <a class="primary" href="${s.maps}" target="_blank" rel="noopener">Cómo llegar</a>
+      <button class="ghost" type="button" data-copy="${esc(s.addr+", "+s.ref+", Huamanga, Ayacucho")}">Copiar dirección</button>
+    </div>
+    <div><div class="meta" style="margin-bottom:6px"><span>WhatsApp de la sede</span></div>
+      <div class="wa-list">${s.wa.map(w=>`<a class="wa-item" href="${wa(w[1],`Hola Malhuayza Motors (${s.name}), quisiera información.`)}" target="_blank" rel="noopener"><div><b>${w[0]}</b><span>${w[1].slice(2).replace(/(\d{3})(\d{3})(\d{3})/,"$1 $2 $3")}</span></div><i>Escribir</i></a>`).join("")}</div>
+    </div>`;
+}
+
+/* ================= CONTACTO ================= */
+function buildContacts(){
+  $("contactList").innerHTML = CONTACTS.map(c=>`<a class="wa-item" href="${wa(c[1],"Hola Malhuayza Motors, quisiera información.")}" target="_blank" rel="noopener"><div><b>${c[0]}</b><span>${c[1].slice(2).replace(/(\d{3})(\d{3})(\d{3})/,"$1 $2 $3")} · ${c[2]}</span></div><i>Escribir</i></a>`).join("");
+}
+
+/* ================= FINANCIAMIENTO ================= */
+const FIN = {key:"",price:0,soat:"0",init:0};
+function buildFin(){
+  const groups=TYPE_ORDER.filter(t=>DATA.some(d=>d.type===t)).map(t=>
+    `<optgroup label="${TYPE_LABEL[t]}">${DATA.filter(d=>d.type===t).sort((a,b)=>a.price-b.price).map(d=>`<option value="${d.key}">${esc(d.brand+" "+d.model)} – ${fmt(d.price)}</option>`).join("")}</optgroup>`).join("");
+  $("finModel").innerHTML=`<option value="">Elige un vehículo…</option>${groups}<option value="otro">Otro monto (escribir precio)</option>`;
+}
+function setFinVehicle(key){
+  FIN.key=key; $("finModel").value=key||"";
+  $("finPriceField").hidden = key!=="otro";
+  FIN.price = key==="otro" ? Math.max(0,+$("finPrice").value||0) : (BY_KEY[key]?BY_KEY[key].price:0);
+  const min=Math.ceil(FIN.price*MIN_INIT/10)*10, max=Math.floor(FIN.price*0.8/10)*10;
+  const r=$("finInit"); r.min=min; r.max=Math.max(min,max);
+  FIN.init = Math.min(Math.max(FIN.init||min,min),+r.max); r.value=FIN.init;
+  renderFin();
+}
+function renderFin(){
+  const p=FIN.price, i=FIN.init, f=Math.max(0,p-i);
+  $("finInitVal").textContent = p?fmt(i):"–";
+  $("finInitPct").textContent = p?`(${Math.round(i/p*100)} %)`:"";
+  $("finInitMin").textContent = p?`Mínimo ${fmt(+$("finInit").min)} (20 % del precio)`:"Primero elige un vehículo.";
+  $("finInit").disabled=!p;
+  $("sumPrice").textContent=p?fmt(p):"–";$("sumInit").textContent=p?fmt(i):"–";$("sumFin").textContent=p?fmt(f):"–";
+  if(!p){ $("plans").innerHTML=`<p class="note" style="grid-column:1/-1">Elige un vehículo del catálogo o escribe un precio para ver tus cuotas aproximadas.</p>`; FIN.msg="Hola Malhuayza Motors, quisiera información sobre el financiamiento."; return; }
+  const rows=[12,18,24].map(m=>{
+    const c=GG[FIN.soat][m], wk=c[0]+c[1]*f+c[2]*p, weeks=Math.round(m*52/12);
+    return {m,wk,month:wk*52/12,total:wk*weeks,int:wk*weeks-f};
+  });
+  $("plans").innerHTML = rows.map((r,idx)=>`
+    <div class="plan${idx===0?" best":""}">${idx===0?'<span class="tag">Menos intereses</span>':""}
+      <h4>${r.m} meses</h4>
+      <div class="wk">${fmt2(r.wk)} <small>/ semana</small></div>
+      <dl><dt>Pago mensual aprox.</dt><dd>${fmt(r.month)}</dd><dt>Total en cuotas</dt><dd>${fmt(r.total)}</dd><dt>Intereses y cargos</dt><dd>${fmt(r.int)}</dd></dl>
+    </div>`).join("");
+  const d=BY_KEY[FIN.key];
+  const name=d?`${d.brand} ${d.model}`:"un vehículo";
+  const msg=`Hola Malhuayza Motors, quiero evaluar un financiamiento:\n• Vehículo: ${name} (${fmt(p)})\n• Cuota inicial: ${fmt(i)}\n• ${FIN.soat==="1"?"Con":"Sin"} SOAT\n• Simulación aprox.: 12 meses ${fmt2(rows[0].wk)}/sem · 18 meses ${fmt2(rows[1].wk)}/sem · 24 meses ${fmt2(rows[2].wk)}/sem\n¿Qué requisitos necesito?`;
+  FIN.msg=msg;
+}
+
+/* ================= BANDEJA "ME INTERESA" ================= */
+function renderTray(){
+  const n=favs.size;
+  $("tray").classList.toggle("on",n>0);
+  $("trayTxt").textContent = `${n} moto${n===1?"":"s"}`;
+  $("trayCmp").hidden = n<2;
+}
+function toggleFav(key){
+  if(favs.has(key)) favs.delete(key); else favs.add(key);
+  store.set("mm-favs",[...favs]);
+  document.querySelectorAll(`[data-fav="${key}"]`).forEach(b=>b.setAttribute("aria-pressed",favs.has(key)));
+  renderTray();
+  if(navigator.vibrate) try{navigator.vibrate(8)}catch(e){}
+}
+function compareSheet(){
+  const items=[...favs].map(k=>BY_KEY[k]).slice(0,3);
+  const row=(label,fn,num)=>`<tr><th scope="row">${label}</th>${items.map(d=>`<td${num?' class="num"':""}>${fn(d)}</td>`).join("")}</tr>`;
+  return `
+    <div class="drag-zone" id="dragZone">
+      <div class="grabber" aria-hidden="true"></div>
+      <div class="sheet-head">
+        <div><div class="meta"><span>${favs.size>3?"Primeras 3 de tu selección":"Tu selección"}</span></div><h3 id="mTitle">Comparar</h3></div>
+        <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div class="cmp"><table>
+      <thead><tr><th></th>${items.map(d=>`<th scope="col">${esc(d.model)}</th>`).join("")}</tr></thead>
+      <tbody>
+        ${row("Marca",d=>d.brand)}
+        ${row("Tipo",d=>d.type)}
+        ${row("Cilindrada",d=>d.cc)}
+        ${row("Precio",d=>fmt(d.price),true)}
+        ${row("Desde / semana*",d=>fmt2(weeklyFrom(d.price)),true)}
+        ${row("Disponibilidad",d=>d.stock?`En tienda (${d.stock})`:"A pedido")}
+        ${row("Colores",d=>d.colors.length?d.colors.map(cap).join(", "):"A consultar")}
+      </tbody>
+    </table></div>
+    <p class="note">*Cuota aproximada a 24 meses sin SOAT, con 20 % de inicial.</p>
+    <button class="wa" type="button" data-send-favs>Enviar mi selección por WhatsApp</button>`;
+}
+function favsMsg(){
+  const items=[...favs].map(k=>BY_KEY[k]);
+  return "Hola Malhuayza Motors, me interesan estos modelos:\n"+items.map(d=>`• ${d.brand} ${d.model} (${fmt(d.price)})`).join("\n")+"\n¿Me pueden dar más información?";
+}
+
+/* ================= HOJA INFERIOR CON RESORTES ================= */
+const SH = {y:0,v:0,H:600,raf:0,mobile:true,closing:false,trigger:null};
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)");
+function openSheet(html,trigger){
+  $("sheet").innerHTML=html; $("sheet").scrollTop=0;
+  SH.trigger = trigger || document.activeElement;
+  const wasOpen=$("modal").classList.contains("open");
+  $("modal").classList.add("open");
+  document.documentElement.style.overflow="hidden";
+  SH.mobile=!matchMedia("(min-width:640px)").matches;
+  SH.H = SH.mobile ? $("sheet").offsetHeight : 48;
+  if(!wasOpen){ SH.y=SH.H; SH.v=0; }
+  SH.closing=false;
+  applySheet();
+  springTo(0,{damping:1,response:.38});
+  const c=$("sheet").querySelector("[data-close]"); if(c) c.focus({preventScroll:true});
+  bindDrag();
+}
+function closeSheet(velocity=0){
+  if(!$("modal").classList.contains("open")||SH.closing) return;
+  SH.closing=true;
+  springTo(SH.H,{damping:1,response:.32,velocity},()=>{
+    $("modal").classList.remove("open");
+    document.documentElement.style.overflow="";
+    SH.closing=false;
+    if(location.hash.startsWith("#moto-")) history.replaceState(null,"","#catalogo");
+    if(SH.trigger&&SH.trigger.focus&&document.contains(SH.trigger)) SH.trigger.focus({preventScroll:true});
+  });
+}
+function applySheet(){
+  const p=Math.min(1,Math.max(0,1-SH.y/SH.H));
+  if(SH.mobile){ $("sheet").style.transform=`translateY(${SH.y}px)`; $("sheet").style.opacity=""; }
+  else { $("sheet").style.transform=`translate(-50%,calc(-50% + ${SH.y}px)) scale(${0.96+0.04*p})`; $("sheet").style.opacity=p; }
+  $("scrim").style.opacity=p;
+}
+function springTo(target,{damping=1,response=.35,velocity}={},done){
+  cancelAnimationFrame(SH.raf);
+  if(velocity!==undefined) SH.v=velocity;
+  if(REDUCED.matches){
+    SH.y=target;SH.v=0;
+    $("sheet").style.transition="opacity 180ms ease";$("scrim").style.transition="opacity 180ms ease";
+    applySheet();
+    if(SH.mobile){ $("sheet").style.transform="none"; $("sheet").style.opacity=target===0?1:0; }
+    setTimeout(()=>{$("sheet").style.transition="";$("scrim").style.transition="";done&&done();},target===0?0:190);
+    return;
+  }
+  const k=Math.pow(2*Math.PI/response,2), c=4*Math.PI*damping/response;
+  let last=performance.now();
+  const step=now=>{
+    let dt=Math.min((now-last)/1000,1/30); last=now;
+    while(dt>0){ const h=Math.min(dt,1/240); const a=-k*(SH.y-target)-c*SH.v; SH.v+=a*h; SH.y+=SH.v*h; dt-=h; }
+    if(Math.abs(SH.v)<8&&Math.abs(SH.y-target)<0.5){ SH.y=target;SH.v=0;applySheet();done&&done();return; }
+    applySheet(); SH.raf=requestAnimationFrame(step);
+  };
+  SH.raf=requestAnimationFrame(step);
+}
+const project=(v,d=0.998)=>(v/1000)*d/(1-d);
+const rubberband=(o,dim,c=0.55)=>(o*dim*c)/(dim+c*Math.abs(o));
+function bindDrag(){
+  const z=$("dragZone"); if(!z) return;
+  z.addEventListener("pointerdown",e=>{
+    if(!SH.mobile||e.target.closest("[data-close]")||e.button>0) return;
+    cancelAnimationFrame(SH.raf); SH.closing=false;
+    z.setPointerCapture(e.pointerId);
+    const startY=e.clientY, startOff=SH.y; const hist=[{t:e.timeStamp,y:e.clientY}];
+    const move=ev=>{
+      const raw=startOff+(ev.clientY-startY);
+      SH.y = raw<0 ? -rubberband(-raw,SH.H) : raw;
+      applySheet();
+      hist.push({t:ev.timeStamp,y:ev.clientY}); if(hist.length>6) hist.shift();
+    };
+    const up=()=>{
+      z.removeEventListener("pointermove",move);z.removeEventListener("pointerup",up);z.removeEventListener("pointercancel",up);
+      const a=hist[0], b=hist[hist.length-1]; const dt=(b.t-a.t)||16;
+      const v=((b.y-a.y)/dt)*1000;
+      if(SH.y+project(v)>SH.H*0.45 || v>900) closeSheet(v);
+      else springTo(0,{damping:.82,response:.3,velocity:v});
+    };
+    z.addEventListener("pointermove",move);z.addEventListener("pointerup",up);z.addEventListener("pointercancel",up);
+  });
+}
+
+/* ================= AVISO BREVE ================= */
+let toastT=0;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),1800); }
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); toast("Copiado ✓"); }
+  catch(e){ toast("No se pudo copiar en este navegador"); }
+}
+
+/* ================= NAVEGACIÓN ================= */
+const VIEWS=["catalogo","tiendas","financiamiento","contacto"];
+function route(){
+  const h=location.hash.slice(1);
+  let view=VIEWS.includes(h)?h:"catalogo";
+  if(h.startsWith("moto-")) view="catalogo";
+  VIEWS.forEach(v=>$("v-"+v).classList.toggle("on",v===view));
+  document.querySelectorAll(".tab").forEach(t=>{ if(t.dataset.view===view) t.setAttribute("aria-current","page"); else t.removeAttribute("aria-current"); });
+  if(h.startsWith("moto-")&&BY_KEY[h.slice(5)]) openSheet(motoSheet(BY_KEY[h.slice(5)]));
+}
+function goView(v){ if(location.hash!=="#"+v) location.hash=v; else route(); window.scrollTo(0,0); }
+
+/* ================= EVENTOS ================= */
+buildCatalogControls(); buildStores(); buildContacts(); buildFin();
+const st=openStatus(); $("openTxt").textContent=st.txt; $("openPill").classList.toggle("closed",!st.open); $("openTxt2").textContent=st.txt;
+
+$("q").addEventListener("input",e=>{S.q=e.target.value;renderCatalog();});
+function clearAll(){ S.types.clear();S.brands.clear();S.ccs.clear();S.avail.clear();S.max=+$("fPrice").max;$("fPrice").value=S.max; }
+$("types").addEventListener("click",e=>{const b=e.target.closest(".type-tile");if(!b)return;const on=toggleIn(S.types,b.dataset.t);renderCatalog();if(on)scrollToResults();});
+$("brands").addEventListener("click",e=>{const b=e.target.closest(".brand-tile");if(!b)return;const on=toggleIn(S.brands,b.dataset.b);renderCatalog();if(on)scrollToResults();});
+$("chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;if(b.dataset.t==="")S.types.clear();else toggleIn(S.types,b.dataset.t);renderCatalog();});
+$("activeFilters").addEventListener("click",e=>{
+  const b=e.target.closest(".af");if(!b)return;
+  if(b.dataset.clear==="all"){clearAll();}
+  else{const i=b.dataset.clear.indexOf(":");S[b.dataset.clear.slice(0,i)].delete(b.dataset.clear.slice(i+1));}
+  renderCatalog();
+});
+[["fBrands","brands"],["fCcs","ccs"],["fAvail","avail"]].forEach(([id,key])=>
+  $(id).addEventListener("click",e=>{const b=e.target.closest(".pill");if(!b)return;toggleIn(S[key],b.dataset.v);renderCatalog();}));
+$("toggleFilters").addEventListener("click",()=>{
+  const open=$("filtersWrap").classList.toggle("open");
+  $("filtersWrap").inert=!open;
+  $("toggleFilters").setAttribute("aria-expanded",open);
+});
+$("fPrice").addEventListener("input",e=>{S.max=+e.target.value;renderCatalog();});
+$("sort").addEventListener("change",e=>{S.sort=e.target.value;renderCatalog();});
+$("reset").addEventListener("click",()=>{clearAll();renderCatalog();});
+$("grid").addEventListener("click",e=>{
+  const f=e.target.closest("[data-fav]"); if(f){toggleFav(f.dataset.fav);return;}
+  const c=e.target.closest("[data-consult]"); if(c){const d=DATA[+c.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),c);return;}
+  const b=e.target.closest("[data-open]"); if(b) openSheet(motoSheet(DATA[+b.dataset.open]),b);
+});
+$("stores").addEventListener("click",e=>{const b=e.target.closest("[data-store]");if(b)openSheet(storeSheet(STORES.find(s=>s.id===b.dataset.store)),b);});
+$("scrim").addEventListener("click",()=>closeSheet());
+$("sheet").addEventListener("click",e=>{
+  if(e.target.closest("[data-close]")){closeSheet();return;}
+  const cp=e.target.closest("[data-copy]"); if(cp){copyText(cp.dataset.copy);return;}
+  const cs=e.target.closest("[data-consult]"); if(cs){const d=DATA[+cs.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),SH.trigger);return;}
+  if(e.target.closest("[data-send-favs]")){openSheet(contactSheet(favsMsg(),"Mi selección"),SH.trigger);return;}
+  const fv=e.target.closest("[data-fav-sheet]"); if(fv){toggleFav(fv.dataset.favSheet);const on=favs.has(fv.dataset.favSheet);fv.textContent=on?"✓ Me interesa":"♡ Me interesa";fv.setAttribute("aria-pressed",on);return;}
+  const cl=e.target.closest("[data-calc]"); if(cl){const k=cl.dataset.calc;closeSheet();FIN.init=0;setFinVehicle(k);goView("financiamiento");return;}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
+
+$("trayCmp").addEventListener("click",e=>openSheet(compareSheet(),e.currentTarget));
+$("trayWa").addEventListener("click",e=>openSheet(contactSheet(favsMsg(),"Mi selección"),e.currentTarget));
+$("finWa").addEventListener("click",e=>openSheet(contactSheet(FIN.msg,"Evaluación de financiamiento"),e.currentTarget));
+$("trayX").addEventListener("click",()=>{favs.clear();store.set("mm-favs",[]);document.querySelectorAll("[data-fav]").forEach(b=>b.setAttribute("aria-pressed","false"));renderTray();});
+
+$("finModel").addEventListener("change",e=>{FIN.init=0;setFinVehicle(e.target.value);});
+$("finPrice").addEventListener("input",()=>{FIN.init=0;setFinVehicle("otro");});
+$("finInit").addEventListener("input",e=>{FIN.init=+e.target.value;renderFin();});
+$("finSoat").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;FIN.soat=b.dataset.v;
+  $("finSoat").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+  renderFin();
+});
+
+const barEl=$("bar");
+const onScroll=()=>barEl.classList.toggle("scrolled",$("v-catalogo").classList.contains("on")&&barEl.getBoundingClientRect().top<=0);
+window.addEventListener("scroll",onScroll,{passive:true});
+window.addEventListener("hashchange",route);
+
+renderCatalog(); renderFin(); renderTray(); route(); onScroll();
+</script>
+</body>
+</html>
