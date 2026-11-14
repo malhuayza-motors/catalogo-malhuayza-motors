@@ -164,6 +164,10 @@ a{color:inherit}
 @media (hover:hover){.card:hover{box-shadow:0 2px 4px rgba(20,20,20,.06),0 12px 28px rgba(20,20,20,.1)}}
 .card-img{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--bg),var(--surface));display:flex;align-items:center;justify-content:center;border:0;border-bottom:1px solid var(--line);color:var(--muted);cursor:pointer;width:100%;padding:0}
 .card-img svg{width:58%;height:auto;opacity:.55}
+.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.gallery{flex:none;width:100%;min-height:0;display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;border-radius:14px}
+.gallery::-webkit-scrollbar{display:none}
+.gallery img{flex:0 0 100%;width:100%;min-width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:14px;scroll-snap-align:center}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.01em}
 .badge.stock{background:var(--ok-soft);color:var(--ok)}
@@ -697,7 +701,7 @@ function makeItem(o,i){
   const ld=parseDate(o.last);
   const colors=cleanColors(o.colors);
   return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
-    colors,stock:o.stock,price:o.price,note:o.note||"",last:ld,sedes:o.sedes||"",
+    colors,stock:o.stock,price:o.price,note:o.note||"",last:ld,sedes:o.sedes||"",photos:o.photos||[],
     isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
     isLast: o.stock===1,
     key: slug(o.brand+" "+o.model),
@@ -730,13 +734,14 @@ function fromSheet(text){
   const H=rows[0].map(h=>norm(h.trim()));
   const col=name=>H.findIndex(h=>h.startsWith(name));
   const ix={brand:col("marca"),model:col("modelo"),type:col("tipo"),cc:col("cilindrada"),colors:col("colores"),
-    stock:col("unidades"),price:col("precio"),order:col("a pedido"),sedes:col("sedes"),note:col("nota"),last:col("fecha")};
+    stock:col("unidades"),price:col("precio"),order:col("a pedido"),sedes:col("sedes"),note:col("nota"),last:col("fecha"),photos:col("fotos")};
   if(ix.brand<0||ix.model<0||ix.price<0) return [];
   const g=(r,k)=>ix[k]>=0?(r[ix[k]]||"").trim():"";
   return rows.slice(1).map(r=>{
     const order=norm(g(r,"order"))==="si";
     return {brand:g(r,"brand").toUpperCase(),model:g(r,"model"),type:g(r,"type"),cc:g(r,"cc"),colors:g(r,"colors"),
-      stock: order?0:toNum(g(r,"stock")), price:toNum(g(r,"price")), note:g(r,"note"), last:g(r,"last"), sedes:g(r,"sedes")};
+      stock: order?0:toNum(g(r,"stock")), price:toNum(g(r,"price")), note:g(r,"note"), last:g(r,"last"), sedes:g(r,"sedes"),
+      photos:g(r,"photos").split(/[\s,]+/).filter(Boolean)};
   });
 }
 setData(store0().get("mm-data",null)||FALLBACK);
@@ -762,6 +767,9 @@ function icon(type){
   if(type==="Scooter"||type==="Eléctrica"||type==="Semiautomática") return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(45,82,20)}${wheel(158,82,20)}<path d="M45 82 H120 L135 50 H75 L70 65 M135 50 L150 22 H165 M158 82 L142 40" ${st}/></svg>`;
   return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(42,80,24)}${wheel(160,80,24)}<path d="M42 80 L75 45 H120 L135 30 H150 M75 45 L95 80 H125 L145 45 L160 80 M88 45 L95 32 H125" ${st}/></svg>`;
 }
+/* Fotos desde Drive (carpeta FOTOS WEB): miniatura del tamaño justo; si falla, prueba el otro servidor de Google */
+const imgSrc = (id,w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+const imgTag = (id,w,alt,lazy=true) => `<img src="${imgSrc(id,w)}" alt="${esc(alt)}"${lazy?' loading="lazy"':""} decoding="async" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}'}else{this.remove()}">`;
 const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>`;
 const wa = (num,msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
 const msgMoto = d => `Hola Malhuayza Motors, me interesa la ${d.brand} ${d.model} (${fmt(d.price)}). ¿Me pueden dar más información?`;
@@ -860,7 +868,7 @@ function card(d){
   const more=d.colors.length>6?`<span class="more">+${d.colors.length-6}</span>`:"";
   return `<article class="card">
     <button class="card-img" type="button" data-open="${d.id}" aria-label="Ver detalle de ${esc(d.brand+" "+d.model)}">
-      ${icon(d.type)}<span class="badges">${badgesHtml(d)}</span>
+      ${icon(d.type)}${d.photos.length?imgTag(d.photos[0],600,d.brand+" "+d.model):""}<span class="badges">${badgesHtml(d)}</span>
     </button>
     <button class="fav" type="button" data-fav="${d.key}" aria-pressed="${favs.has(d.key)}" aria-label="Me interesa: ${esc(d.model)}">${heart}</button>
     <div class="card-body">
@@ -921,6 +929,7 @@ function motoSheet(d){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
+    ${d.photos.length?`<div class="gallery" aria-label="Fotos de ${esc(d.model)}">${d.photos.map((p,i)=>imgTag(p,1200,`${d.brand} ${d.model} – foto ${i+1}`,i>0)).join("")}</div>${d.photos.length>1?`<p class="more" style="margin:-4px 0 0;text-align:center">Desliza para ver las ${d.photos.length} fotos</p>`:""}`:""}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
     <div class="price"><small>Precio de lista</small><b>${fmt(d.price)}</b><em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
     <dl class="dl">
