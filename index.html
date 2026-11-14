@@ -513,7 +513,7 @@ button,a,.chip,.store,select{touch-action:manipulation;-webkit-tap-highlight-col
   </div>
 </section>
 
-<p class="foot">Precios de lista en soles, sujetos a cambio sin previo aviso. Stock referencial.</p>
+<p class="foot">Precios de lista en soles, sujetos a cambio sin previo aviso. Stock referencial.<br><span id="updated"></span></p>
 
 <div class="tray" id="tray" role="region" aria-label="Motos seleccionadas">
   <span id="trayTxt"></span>
@@ -543,6 +543,10 @@ button,a,.chip,.store,select{touch-action:manipulation;-webkit-tap-highlight-col
 /* Números que aparecen al tocar "Consultar" (código de país + número, sin espacios). Se muestran solo como "Contacto". */
 const SALES = ["51989005413","51941052030"];
 const WHATSAPP = SALES[0];
+
+/* Enlace CSV de la pestaña "Web" publicada (Archivo → Compartir → Publicar en la Web).
+   Si está vacío o falla, la página usa la última copia guardada o los datos de respaldo de abajo. */
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9CpWcPpaDjFhx02fPZ6XUo5EK4oh77hbo7fav8LDv3n1OAZPGr5ruVBXbLXGhcOBulwP_qwHR6228/pub?gid=100&single=true&output=csv";
 
 /* Logos de marca: cuando subas los archivos a la carpeta img/marcas/ escribe aquí la ruta, ej. JCH:"img/marcas/jch.png" */
 const BRAND_LOGO = {};
@@ -678,18 +682,65 @@ const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const parseDate = s => { if(!s) return null; const [d,m,y]=s.split("/").map(Number); return new Date(y,m-1,d); };
 const TODAY = new Date();
 
-const DATA = RAW.map((r,i)=>{
-  const [brand,model,type,cc,colors,stock,price,note,last]=r;
-  const ld=parseDate(last);
-  return {id:i,brand,model,type,cc,ccNum:parseInt(cc,10)||0,electric:/w$/i.test(cc),
-    colors:colors?colors.split(",").map(s=>s.trim()).filter(Boolean):[],
-    stock,price,note,last:ld,
-    isNew: !!ld && stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
-    isLast: stock===1,
-    key: slug(brand+" "+model),
-    text: norm(brand+" "+model+" "+type+" "+cc+" "+colors)};
-});
-const BY_KEY = Object.fromEntries(DATA.map(d=>[d.key,d]));
+/* Limpia colores del Sheet: quita cantidades "(2)" y "A pedido:", separa por coma o "|", sin repetidos */
+function cleanColors(s){
+  if(!s) return [];
+  const out=[];
+  String(s).split(/[,|\n]/).forEach(p=>{
+    const c=p.replace(/a pedido:/i,"").replace(/\(\d+\)/g,"").replace(/\s+/g," ").trim().toUpperCase();
+    if(c&&!out.includes(c)) out.push(c);
+  });
+  return out;
+}
+const toNum = v => { const t=String(v??"").replace(/[^\d,.]/g,""); if(!t) return 0; const i=t.split(",")[0].replace(/\./g,""); return parseInt(i,10)||0; };
+function makeItem(o,i){
+  const ld=parseDate(o.last);
+  const colors=cleanColors(o.colors);
+  return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
+    colors,stock:o.stock,price:o.price,note:o.note||"",last:ld,sedes:o.sedes||"",
+    isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
+    isLast: o.stock===1,
+    key: slug(o.brand+" "+o.model),
+    text: norm([o.brand,o.model,o.type,o.cc,colors.join(" ")].join(" "))};
+}
+const FALLBACK = RAW.map(([brand,model,type,cc,colors,stock,price,note,last])=>({brand,model,type,cc,colors,stock,price,note,last,sedes:""}));
+let DATA = [], BY_KEY = {};
+function setData(list){
+  DATA = list.filter(o=>o.brand&&o.model&&o.price>0).map(makeItem);
+  BY_KEY = Object.fromEntries(DATA.map(d=>[d.key,d]));
+  DATA.forEach(d=>{ if(!TYPE_LABEL[d.type]){ TYPE_LABEL[d.type]=d.type; TYPE_COLOR[d.type]="#3b3f46"; TYPE_ORDER.push(d.type); } });
+}
+
+/* Lector de CSV (respeta comillas y saltos de línea dentro de celdas) */
+function parseCSV(text){
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=""; }
+    else if(c==='\n'){ row.push(f); rows.push(row); row=[]; f=""; }
+    else if(c!=='\r') f+=c;
+  }
+  if(f||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+function fromSheet(text){
+  const rows=parseCSV(text); if(rows.length<2) return [];
+  const H=rows[0].map(h=>norm(h.trim()));
+  const col=name=>H.findIndex(h=>h.startsWith(name));
+  const ix={brand:col("marca"),model:col("modelo"),type:col("tipo"),cc:col("cilindrada"),colors:col("colores"),
+    stock:col("unidades"),price:col("precio"),order:col("a pedido"),sedes:col("sedes"),note:col("nota"),last:col("fecha")};
+  if(ix.brand<0||ix.model<0||ix.price<0) return [];
+  const g=(r,k)=>ix[k]>=0?(r[ix[k]]||"").trim():"";
+  return rows.slice(1).map(r=>{
+    const order=norm(g(r,"order"))==="si";
+    return {brand:g(r,"brand").toUpperCase(),model:g(r,"model"),type:g(r,"type"),cc:g(r,"cc"),colors:g(r,"colors"),
+      stock: order?0:toNum(g(r,"stock")), price:toNum(g(r,"price")), note:g(r,"note"), last:g(r,"last"), sedes:g(r,"sedes")};
+  });
+}
+setData(store0().get("mm-data",null)||FALLBACK);
+function store0(){ return {get(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }}; }
 
 const fmt = n => "S/ " + Math.round(n).toLocaleString("es-PE");
 const fmt2 = n => "S/ " + n.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -877,6 +928,7 @@ function motoSheet(d){
       <dt>Tipo</dt><dd>${d.type}</dd>
       <dt>${d.electric?"Potencia":"Cilindrada"}</dt><dd>${d.cc}</dd>
       <dt>Disponibilidad</dt><dd>${d.stock?`En tienda (${d.stock} ${d.stock===1?"unidad":"unidades"})`:"A pedido"}</dd>
+      ${d.sedes?`<dt>Dónde verla</dt><dd>${esc(d.sedes).replace(/\n/g,"<br>")}</dd>`:""}
       ${d.note?`<dt>Modelo</dt><dd>${d.note}</dd>`:""}
     </dl>
     <div><div class="meta" style="margin-bottom:6px"><span>Colores</span></div>
@@ -1181,6 +1233,31 @@ window.addEventListener("scroll",onScroll,{passive:true});
 window.addEventListener("hashchange",route);
 
 renderCatalog(); renderFin(); renderTray(); route(); onScroll();
+
+/* Carga los datos al día desde la pestaña "Web" del Sheet */
+function rebuildControls(){
+  ["types","chips","brands","fBrands"].forEach(id=>$(id).innerHTML="");
+  const keepMax = S.max<+$("fPrice").max ? S.max : null;
+  buildCatalogControls(); buildFin();
+  if(keepMax) { S.max=keepMax; $("fPrice").value=keepMax; }
+  favs = new Set([...favs].filter(k=>BY_KEY[k]));
+  if(FIN.key&&FIN.key!=="otro") setFinVehicle(FIN.key);
+  renderCatalog(); renderTray();
+}
+async function loadSheet(){
+  if(!SHEET_CSV_URL) return;
+  try{
+    const res = await fetch(SHEET_CSV_URL+(SHEET_CSV_URL.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"});
+    if(!res.ok) throw new Error(res.status);
+    const list = fromSheet(await res.text());
+    if(list.length<5) throw new Error("pocos datos");
+    setData(list);
+    store.set("mm-data",list);
+    rebuildControls();
+    $("updated").textContent = "Precios y stock actualizados: "+new Date().toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+  }catch(e){ /* se queda con la última copia guardada */ }
+}
+loadSheet();
 </script>
 </body>
 </html>
