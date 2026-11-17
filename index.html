@@ -369,7 +369,14 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .dl dt{color:var(--muted);font-weight:600}
 .dl dd{margin:0}
 .color-list{display:flex;flex-wrap:wrap;gap:6px}
-.color-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 5px;font-size:13px}
+.color-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 5px;font-size:13px;background:transparent}
+.color-pill.pick{min-height:40px;padding:6px 12px 6px 7px;font-weight:600;cursor:pointer;transition:border-color 150ms ease,box-shadow 150ms ease,transform 100ms ease-out}
+.color-pill.pick .sw{width:20px;height:20px}
+@media (hover:hover){.color-pill.pick:hover{border-color:var(--ink)}}
+.color-pill.pick:active{transform:scale(.96)}
+.color-pill.pick[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);color:var(--brand)}
+.color-pill.off{opacity:.6}
+.color-pill.off small{font-size:11px;color:var(--muted);margin-left:2px}
 .sheet .wa,.sheet .primary{padding:13px;font-size:16px}
 .cmp{overflow-x:auto}
 .cmp table{border-collapse:collapse;width:100%;font-size:14px;min-width:420px}
@@ -810,8 +817,9 @@ function makeItem(o,i){
   const ld=parseDate(o.last);
   const colors=cleanColors(o.colors);
   const nt=readNote(o.note,o.price);
+  const toks=o.photos||[], phIds=toks.map(t=>String(t).split("~")[0]), phCols=toks.map(t=>(String(t).split("~")[1]||"").replace(/\+/g," "));
   return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
-    colors,stock:o.stock,price:nt.offer||o.price,list:o.price,offer:!!nt.offer,note:nt.note,last:ld,sedes:o.sedes||"",photos:o.photos||[],
+    colors,stock:o.stock,price:nt.offer||o.price,list:o.price,offer:!!nt.offer,note:nt.note,last:ld,sedes:o.sedes||"",photos:phIds,photoColors:phCols,
     isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
     isLast: o.stock===1,
     key: slug(o.brand+" "+o.model),
@@ -1073,12 +1081,16 @@ function scrollToResults(){
 }
 
 /* ================= GALERÍA DE FOTOS ================= */
+/* Colores: "ROJO NEGRO" y "Negro Rojo" se comparan sin tildes ni mayúsculas; primero exacto, luego por palabras */
+const colorKey = s => norm(String(s||"")).replace(/\s+/g," ").trim();
+const sameColor = (a,b) => { const x=colorKey(a), y=colorKey(b); if(!x||!y) return false; return x===y || x.split(" ").sort().join(" ")===y.split(" ").sort().join(" "); };
+function firstPhotoOf(d,c){ const exact=d.photoColors.findIndex(p=>colorKey(p)===colorKey(c)); return exact>=0?exact:d.photoColors.findIndex(p=>sameColor(p,c)); }
 /* Flechas para pasar las fotos (útiles en computadora) y puntos que indican cuál foto se ve */
 const ARROW = d => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d<0?"m15 5-7 7 7 7":"m9 5 7 7-7 7"}"/></svg>`;
 const ZOOM = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`;
-function galleryHtml(ids,alt,cover,full){
-  const n=ids.length;
-  return `<div class="gal${cover?" cover":""}${full?" lb-gal":""}" data-ids="${esc(ids.join(" "))}" data-alt="${esc(alt)}">
+function galleryHtml(ids,alt,cover,full,colors){
+  const n=ids.length; colors=colors||[];
+  return `<div class="gal${cover?" cover":""}${full?" lb-gal":""}" data-ids="${esc(ids.join(" "))}" data-alt="${esc(alt)}" data-colors="${esc(colors.map(c=>c.replace(/ /g,"+")).join(" "))}">
     <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>imgTag(p,full?1600:1200,`${alt} – foto ${i+1}`,i>0)).join("")}</div>
     ${full?"":`<button class="gal-zoom" type="button" data-zoom aria-label="Ver fotos en pantalla completa">${ZOOM}<span>Ampliar</span></button>`}
     ${n>1?`<button class="gal-btn prev" type="button" data-gal="-1" aria-label="Foto anterior" hidden>${ARROW(-1)}</button>
@@ -1092,22 +1104,25 @@ function bindGalleries(root){
     const track=g.querySelector(".gallery"), prev=g.querySelector(".prev"), next=g.querySelector(".next");
     if(!prev) return;
     const dots=[...g.querySelectorAll(".gal-dots i")], count=g.querySelector(".gal-count"), n=dots.length;
+    const cols=(g.dataset.colors||"").split(" ").map(c=>c.replace(/\+/g," "));
     const idx=()=>Math.round(track.scrollLeft/Math.max(1,track.clientWidth+8));
     const sync=()=>{ const i=Math.min(n-1,Math.max(0,idx())); prev.hidden=i<=0; next.hidden=i>=n-1;
-      dots.forEach((d,k)=>d.classList.toggle("on",k===i)); count.textContent=`${i+1} / ${n}`; };
+      dots.forEach((d,k)=>d.classList.toggle("on",k===i)); count.textContent=(cols[i]?cap(cols[i])+" · ":"")+`${i+1} / ${n}`;
+      if(g._i!==i){ g._i=i; g.dispatchEvent(new CustomEvent("galchange",{detail:{i,color:cols[i]||""}})); } };
     const go=dir=>{ const i=Math.min(n-1,Math.max(0,idx()+dir));
       track.scrollTo({left:i*(track.clientWidth+8),behavior:REDUCED.matches?"auto":"smooth"}); };
     track.addEventListener("scroll",()=>{ cancelAnimationFrame(track._r); track._r=requestAnimationFrame(sync); },{passive:true});
     prev.addEventListener("click",()=>go(-1)); next.addEventListener("click",()=>go(1));
+    g._goTo=i=>track.scrollTo({left:i*(track.clientWidth+8),behavior:REDUCED.matches?"auto":"smooth"});
     track.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"){e.preventDefault();go(1);} if(e.key==="ArrowLeft"){e.preventDefault();go(-1);} });
     sync();
   });
 }
 /* Pantalla completa: las mismas fotos en grande, con flechas, puntos y contador */
 const LB = {open:false,pushed:false,trigger:null};
-function openLightbox(ids,alt,start,trigger){
+function openLightbox(ids,alt,start,trigger,colors){
   const lb=$("lb");
-  lb.innerHTML=`<button class="lb-x" type="button" data-lb-close aria-label="Cerrar pantalla completa">×</button>${galleryHtml(ids,alt,false,true)}`;
+  lb.innerHTML=`<button class="lb-x" type="button" data-lb-close aria-label="Cerrar pantalla completa">×</button>${galleryHtml(ids,alt,false,true,colors)}`;
   lb.hidden=false; LB.open=true; LB.trigger=trigger||null;
   try{ history.pushState({lb:1},""); LB.pushed=true; }catch(e){}
   const tr=lb.querySelector(".gallery");
@@ -1133,7 +1148,8 @@ function motoSheet(d){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false):""}
+    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors.map(pc=>pc&&(d.colors.find(c=>sameColor(c,pc))||pc))):""}
+    ${colorsBlock(d)}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
     <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
     <dl class="dl">
@@ -1144,9 +1160,6 @@ function motoSheet(d){
       ${d.sedes?`<dt>Dónde verla</dt><dd>${esc(d.sedes).replace(/\n/g,"<br>")}</dd>`:""}
       ${d.note?`<dt>Modelo</dt><dd>${esc(d.note)}</dd>`:""}
     </dl>
-    <div><div class="meta" style="margin-bottom:6px"><span>Colores</span></div>
-      <div class="color-list">${d.colors.length?d.colors.map(c=>`<span class="color-pill">${swatch(c)}${cap(c)}</span>`).join(""):'<span class="more">Consultar colores disponibles</span>'}</div>
-    </div>
     ${INCLUDED}
     <button class="wa" type="button" data-consult="${d.id}">Consultar por WhatsApp</button>
     <div class="btn-row">
@@ -1154,6 +1167,25 @@ function motoSheet(d){
       <button class="ghost" type="button" data-fav-sheet="${d.key}" aria-pressed="${favs.has(d.key)}">${favs.has(d.key)?"✓ Me interesa":"♡ Me interesa"}</button>
     </div>
     <button class="ghost" type="button" data-copy="${esc(shareUrl)}">Copiar enlace de esta moto</button>`;
+}
+
+/* Colores de la ficha: si las fotos tienen color en el nombre, cada color lleva a su foto */
+function colorsBlock(d){
+  if(!d.colors.length) return `<div><div class="meta" style="margin-bottom:6px"><span>Colores</span></div><div class="color-list"><span class="more">Consultar colores disponibles</span></div></div>`;
+  const linked=d.photoColors.some(Boolean);
+  const pills=d.colors.map(c=>{
+    if(!linked) return `<span class="color-pill">${swatch(c)}${cap(c)}</span>`;
+    const i=firstPhotoOf(d,c);
+    return i>=0 ? `<button class="color-pill pick" type="button" data-color-idx="${i}" data-color="${esc(c)}" aria-pressed="false">${swatch(c)}${cap(c)}</button>`
+                : `<span class="color-pill off" title="Aún no tenemos foto de este color">${swatch(c)}${cap(c)}<small>sin foto aún</small></span>`;
+  }).join("");
+  return `<div><div class="meta" style="margin-bottom:6px"><span>Colores${linked?" · toca uno para ver su foto":""}</span></div><div class="color-list" id="colorList">${pills}</div></div>`;
+}
+function bindColorPicks(){
+  const g=$("sheet").querySelector(".gal"), list=$("colorList"); if(!g||!list) return;
+  const mark=color=>list.querySelectorAll(".pick").forEach(b=>b.setAttribute("aria-pressed",sameColor(b.dataset.color,color)?"true":"false"));
+  g.addEventListener("galchange",e=>mark(e.detail.color));
+  const i=g._i||0, c=(g.dataset.colors||"").split(" ")[i]; mark((c||"").replace(/\+/g," "));
 }
 
 /* ================= TIENDAS ================= */
@@ -1300,7 +1332,7 @@ function openSheet(html,trigger){
   applySheet();
   springTo(0,{damping:1,response:.38});
   const c=$("sheet").querySelector("[data-close]"); if(c) c.focus({preventScroll:true});
-  bindDrag(); bindGalleries($("sheet"));
+  bindDrag(); bindGalleries($("sheet")); bindColorPicks();
 }
 function closeSheet(velocity=0,fromHistory=false){
   if(!$("modal").classList.contains("open")||SH.closing) return;
@@ -1437,7 +1469,9 @@ $("scrim").addEventListener("click",()=>closeSheet());
 $("sheet").addEventListener("click",e=>{
   if(e.target.closest("[data-close]")){closeSheet();return;}
   const zg=e.target.closest("[data-zoom], .gal .gallery img"); if(zg){ const g=zg.closest(".gal"); const tr=g.querySelector(".gallery");
-    openLightbox(g.dataset.ids.split(" "),g.dataset.alt,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)),zg); return; }
+    openLightbox(g.dataset.ids.split(" "),g.dataset.alt,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)),zg,(g.dataset.colors||"").split(" ").map(c=>c.replace(/\+/g," "))); return; }
+  const cb=e.target.closest("[data-color-idx]"); if(cb){ const g=$("sheet").querySelector(".gal"); if(g&&g._goTo){ g._goTo(+cb.dataset.colorIdx);
+    const sh=$("sheet"), top=g.offsetTop-($("dragZone")?$("dragZone").offsetHeight:0)-8; if(sh.scrollTop>top) sh.scrollTo({top:Math.max(0,top),behavior:REDUCED.matches?"auto":"smooth"}); track("ver_color",{modelo:g.dataset.alt,color:cb.dataset.color}); } return; }
   const cp=e.target.closest("[data-copy]"); if(cp){track("copiar_enlace");copyText(cp.dataset.copy);return;}
   const cs=e.target.closest("[data-consult]"); if(cs){const d=DATA[+cs.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),SH.trigger);return;}
   if(e.target.closest("[data-send-favs]")){openSheet(contactSheet(favsMsg(),"Mi selección"),SH.trigger);return;}
