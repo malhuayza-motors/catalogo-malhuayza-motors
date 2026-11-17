@@ -153,7 +153,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 @media (hover:hover){.feat-card:hover .go{text-decoration:underline;text-underline-offset:3px}}
 
 /* Marcas */
-.brands{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.brands{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 6px 10px;margin:0 -4px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
 .brands::-webkit-scrollbar{display:none}
 .brand-tile{flex:none;scroll-snap-align:start;width:132px;height:84px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:var(--shadow)}
 .brand-tile b{font-family:var(--font-display);font-size:24px;letter-spacing:.02em;line-height:1}
@@ -162,6 +162,14 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .brand-tile.has-logo{position:relative;justify-content:center;gap:4px}
 .brand-tile[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
 .brand-tile .logo{width:84%;height:46px;object-fit:contain;background:#fff;border-radius:8px;padding:3px 6px}
+/* Cada marca con el color de fondo de su logo: el cuadro entero es el "letrero" de la marca */
+.brand-tile.branded{background:var(--bc);border-color:transparent;color:var(--bf);gap:2px}
+.brand-tile.branded small{color:var(--bf);opacity:.92}
+.brand-tile.branded.light-txt small{text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.brand-tile.branded .logo{width:100%;height:54px;background:transparent;border-radius:0;padding:4px 8px 0}
+.brand-tile.branded[aria-pressed="true"]{border-color:transparent;box-shadow:0 0 0 2px var(--bg),0 0 0 5px var(--ink)}
+.brand-tile[aria-pressed="true"]::after{content:"";position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;border:2px solid #fff;background:#16181b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center/13px no-repeat;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.brand-tile{position:relative}
 
 /* Barra de búsqueda fija */
 .bar{position:sticky;top:0;z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid transparent;transition:box-shadow 200ms ease,border-color 200ms ease;margin-top:14px}
@@ -739,6 +747,15 @@ const SALES_LABEL = {"51989005413":"Contacto · Américo Oré","51941052030":"Co
    Si está vacío o falla, la página usa la última copia guardada o los datos de respaldo de abajo. */
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9CpWcPpaDjFhx02fPZ6XUo5EK4oh77hbo7fav8LDv3n1OAZPGr5ruVBXbLXGhcOBulwP_qwHR6228/pub?gid=100&single=true&output=csv";
 
+/* Color de fondo de cada logo de marca (el cuadro de la marca se rellena con él).
+   "fondo|texto": el texto de la cantidad de modelos va en blanco u oscuro según el fondo, salvo que se indique.
+   Una marca nueva sin color aquí (ni en la columna "Color logo" del Sheet) queda en blanco. */
+const BRAND_COLORS = {
+  JCH:"#ffa938|#ffffff",   // naranja; texto en blanco (pedido)
+  ARTSUN:"#f80205", SENKE:"#0084c5", STRONG:"#08478a",
+  ADVANCE:"#ffffff", QINGQI:"#ffffff", SHENGLI:"#ffffff"
+};
+
 /* Contador de visitas (Google Analytics 4). Pega aquí el ID de medición "G-XXXXXXXXXX"; vacío = desactivado */
 const GA_ID = "G-M87ZML5VDM";
 
@@ -943,11 +960,12 @@ function fromSheet(text){
     stock:col("unidades"),price:col("precio"),order:col("a pedido"),sedes:col("sedes"),note:col("nota"),last:col("fecha"),photos:col("fotos")};
   if(ix.brand<0||ix.model<0||ix.price<0) return [];
   const g=(r,k)=>ix[k]>=0?(r[ix[k]]||"").trim():"";
-  const iLogo=col("logo"), iLocal=col("local"), iLocalImg=col("imagenes");
+  const iLogo=col("logo"), iLocal=col("local"), iLocalImg=col("imagenes"), iColor=col("color logo");
   const logos={}, locals={};
   rows.slice(1).forEach(r=>{
     const b=(r[ix.brand]||"").trim().toUpperCase(), lg=iLogo>=0?(r[iLogo]||"").trim().split(/\s+/)[0]:"";
     if(b&&lg) logos[b]=lg;
+    const lc=iColor>=0?(r[iColor]||"").trim():""; if(b&&/^#[0-9a-f]{3,6}(\|#[0-9a-f]{3,6})?$/i.test(lc)) BRAND_COLORS[b]=lc;
     const ln=iLocal>=0?(r[iLocal]||"").trim():"", li=iLocalImg>=0?(r[iLocalImg]||"").trim():"";
     if(ln&&li) locals[slug(ln)]=li.split(/[\s,]+/).filter(Boolean);
   });
@@ -1055,11 +1073,22 @@ function buildCatalogControls(){
     /* Logo de la marca desde la carpeta LOGOS de Drive; si falla, se muestra el nombre */
     const lid=LOGOS[b];
     const img=lid?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" data-ld onload="this.classList.add('ok')" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
-    return `<button class="brand-tile${lid?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}">${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
+    const bcol=lid?brandColor(b):null;
+    const st=bcol?` style="--bc:${bcol.bg};--bf:${bcol.fg}"`:"";
+    return `<button class="brand-tile${lid?" has-logo branded":""}${bcol&&bcol.light?" light-txt":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}"${st}>${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
   }).join("");
   $("fBrands").innerHTML = brands.slice().sort().map(b=>`<button class="pill" type="button" data-v="${b}" aria-pressed="false">${b}<small>${bc[b]}</small></button>`).join("");
   const maxP=Math.ceil(Math.max(...DATA.map(d=>d.price))/500)*500;
   $("fPrice").max=maxP;$("fPrice").value=maxP;S.max=maxP;
+}
+
+/* Color del cuadro de una marca: fondo del logo y texto que se lea bien sobre él */
+function brandColor(b){
+  const [bg,fg0]=String(BRAND_COLORS[b]||"#ffffff").split("|");
+  const h=bg.replace("#",""), x=h.length===3?h.split("").map(c=>c+c).join(""):h;
+  const [r,g,bl]=[0,2,4].map(i=>parseInt(x.slice(i,i+2),16)||0);
+  const fg=fg0||((0.299*r+0.587*g+0.114*bl)<150?"#ffffff":"#16181b");
+  return {bg, fg, light:/^#f{3}(f{3})?$/i.test(fg)};
 }
 
 /* Destacados: primero las unidades con Precio especial, luego los nuevos ingresos (con foto primero) */
