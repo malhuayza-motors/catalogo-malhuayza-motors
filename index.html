@@ -799,6 +799,16 @@ const COLOR_HEX = {NEGRO:"#17181a",BLANCO:"#f7f7f5",ROJO:"#d32027",AZUL:"#1f4fd6
 
 const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+/* Colores: "ROJO NEGRO" y "Negro Rojo" se comparan sin tildes ni mayúsculas; primero exacto, luego por palabras */
+const colorKey = s => norm(String(s||"")).replace(/\s+/g," ").trim();
+const sameColor = (a,b) => { const x=colorKey(a), y=colorKey(b); if(!x||!y) return false; return x===y || x.split(" ").sort().join(" ")===y.split(" ").sort().join(" "); };
+/* Color de una foto: del nombre ("01 rojo portada") se toma el color del modelo que calce (el más largo); si ninguno calza, sin color */
+function photoColor(raw,colors){
+  const w=new Set(colorKey(raw).split(" ").filter(Boolean)); if(!w.size) return "";
+  let best="";
+  colors.forEach(c=>{ const cw=colorKey(c).split(" ").filter(Boolean); if(cw.length&&cw.every(x=>w.has(x))&&cw.length>colorKey(best).split(" ").filter(Boolean).length) best=c; });
+  return best;
+}
 const parseDate = s => { if(!s) return null; const [d,m,y]=s.split("/").map(Number); return new Date(y,m-1,d); };
 const TODAY = new Date();
 
@@ -817,7 +827,7 @@ function makeItem(o,i){
   const ld=parseDate(o.last);
   const colors=cleanColors(o.colors);
   const nt=readNote(o.note,o.price);
-  const toks=o.photos||[], phIds=toks.map(t=>String(t).split("~")[0]), phCols=toks.map(t=>(String(t).split("~")[1]||"").replace(/\+/g," "));
+  const toks=o.photos||[], phIds=toks.map(t=>String(t).split("~")[0]), phCols=toks.map(t=>photoColor((String(t).split("~")[1]||"").replace(/\+/g," "),colors));
   return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
     colors,stock:o.stock,price:nt.offer||o.price,list:o.price,offer:!!nt.offer,note:nt.note,last:ld,sedes:o.sedes||"",photos:phIds,photoColors:phCols,
     isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
@@ -1081,9 +1091,6 @@ function scrollToResults(){
 }
 
 /* ================= GALERÍA DE FOTOS ================= */
-/* Colores: "ROJO NEGRO" y "Negro Rojo" se comparan sin tildes ni mayúsculas; primero exacto, luego por palabras */
-const colorKey = s => norm(String(s||"")).replace(/\s+/g," ").trim();
-const sameColor = (a,b) => { const x=colorKey(a), y=colorKey(b); if(!x||!y) return false; return x===y || x.split(" ").sort().join(" ")===y.split(" ").sort().join(" "); };
 function firstPhotoOf(d,c){ const exact=d.photoColors.findIndex(p=>colorKey(p)===colorKey(c)); return exact>=0?exact:d.photoColors.findIndex(p=>sameColor(p,c)); }
 /* Flechas para pasar las fotos (útiles en computadora) y puntos que indican cuál foto se ve */
 const ARROW = d => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d<0?"m15 5-7 7 7 7":"m9 5 7 7-7 7"}"/></svg>`;
@@ -1148,7 +1155,7 @@ function motoSheet(d){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors.map(pc=>pc&&(d.colors.find(c=>sameColor(c,pc))||pc))):""}
+    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors):""}
     ${colorsBlock(d)}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
     <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
