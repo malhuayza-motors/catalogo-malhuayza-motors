@@ -49,6 +49,8 @@
   --glass-edge:rgba(255,255,255,.55);
   --scrim:rgba(10,10,12,.45);
   --tabbar-h:64px;
+  --ph1:#e9e9e6;
+  --ph2:#f6f6f4;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
@@ -57,7 +59,7 @@
     --brand:#ef3b40;--brand-ink:#ffffff;--brand-soft:#3a1c1d;
     --ok:#4cc483;--ok-soft:#173527;--wait:#e5b44a;--wait-soft:#3a2f14;--new:#79a4ff;--new-soft:#1b2846;--wa:#15803d;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
-    --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
+    --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);--ph1:#26292d;--ph2:#33363b;
     color-scheme:dark;
   }
 }
@@ -66,7 +68,7 @@
   --brand:#ef3b40;--brand-ink:#ffffff;--brand-soft:#3a1c1d;
   --ok:#4cc483;--ok-soft:#173527;--wait:#e5b44a;--wait-soft:#3a2f14;--new:#79a4ff;--new-soft:#1b2846;--wa:#15803d;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.35);
-  --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
+  --glass:rgba(18,19,21,.72);--glass-strong:rgba(24,26,29,.85);--glass-edge:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);--ph1:#26292d;--ph2:#33363b;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -201,7 +203,15 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 
 /* Resumen y grilla */
 .summary{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding:14px 0 10px}
-.summary>div{min-width:0}
+.summary{flex-wrap:wrap}
+.summary>div{min-width:0;flex:1 1 190px}
+/* Fotos: brillo suave mientras cargan; aparecen con un fundido al llegar */
+img[data-ld]:not(.ok){background:linear-gradient(100deg,var(--ph1) 35%,var(--ph2) 50%,var(--ph1) 65%) 0 0/300% 100%;animation:shimmer 1.4s linear infinite}
+img[data-ld].ok{animation:imgIn 280ms ease-out}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:0 0}}
+@keyframes imgIn{from{opacity:0}to{opacity:1}}
+.stale.offline{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.stale.offline svg{color:var(--wait)}
 .grid-note{margin:-14px 0 24px;font-size:12px;color:var(--muted)}
 .summary p{margin:0;color:var(--muted);font-size:14px}
 .sort{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
@@ -975,7 +985,7 @@ function icon(type){
 }
 /* Fotos desde Drive (carpeta FOTOS WEB): miniatura del tamaño justo; si falla, prueba el otro servidor de Google */
 const imgSrc = (id,w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
-const imgTag = (id,w,alt,lazy=true) => `<img src="${imgSrc(id,w)}" alt="${esc(alt)}"${lazy?' loading="lazy"':""} decoding="async" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}'}else{this.remove()}">`;
+const imgTag = (id,w,alt,lazy=true) => `<img src="${imgSrc(id,w)}" alt="${esc(alt)}"${lazy?' loading="lazy"':""} decoding="async" data-ld onload="this.classList.add('ok')" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}'}else{this.remove()}">`;
 const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>`;
 const wa = (num,msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
 const msgMoto = d => `Hola Malhuayza Motors, me interesa la ${d.brand} ${d.model} (${fmt(d.price)}). ¿Me pueden dar más información?`;
@@ -1035,7 +1045,7 @@ function buildCatalogControls(){
   const types=TYPE_ORDER.filter(t=>counts[t]);
   $("types").innerHTML = types.map(t=>{
     const withPh=DATA.filter(d=>d.type===t&&d.photos.length).sort((a,b)=>(b.stock>0)-(a.stock>0));
-    const ph=withPh.length?`<img src="${imgSrc(withPh[0].photos[0],400)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:"";
+    const ph=withPh.length?`<img src="${imgSrc(withPh[0].photos[0],400)}" alt="" loading="lazy" decoding="async" data-ld onload="this.classList.add('ok')" onerror="this.remove()">`:"";
     return `<button class="type-tile" type="button" data-t="${t}" aria-pressed="false"><span class="ph">${icon(t)}${ph}</span><span class="lbl"><b>${TYPE_LABEL[t]}</b><small>${counts[t]} modelo${counts[t]>1?"s":""}</small></span></button>`;
   }).join("");
   $("fTypes").innerHTML = types.map(t=>`<button class="pill" type="button" data-v="${t}" aria-pressed="false">${TYPE_LABEL[t]}<small>${counts[t]}</small></button>`).join("");
@@ -1044,7 +1054,7 @@ function buildCatalogControls(){
   $("brands").innerHTML = brands.map(b=>{
     /* Logo de la marca desde la carpeta LOGOS de Drive; si falla, se muestra el nombre */
     const lid=LOGOS[b];
-    const img=lid?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
+    const img=lid?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" data-ld onload="this.classList.add('ok')" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
     return `<button class="brand-tile${lid?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}">${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
   }).join("");
   $("fBrands").innerHTML = brands.slice().sort().map(b=>`<button class="pill" type="button" data-v="${b}" aria-pressed="false">${b}<small>${bc[b]}</small></button>`).join("");
@@ -1421,7 +1431,7 @@ function openSheet(html,trigger){
   SH.closing=false;
   applySheet();
   springTo(0,{damping:1,response:.38});
-  const c=$("sheet").querySelector("[data-close]"); if(c) c.focus({preventScroll:true});
+  const c=$("sheet").querySelector("[data-close]"); if(c) c.focus({preventScroll:true,focusVisible:false});
   bindDrag(); bindGalleries($("sheet")); bindColorPicks();
 }
 function closeSheet(velocity=0,fromHistory=false){
@@ -1618,16 +1628,31 @@ async function loadSheet(){
     setData(list);
     store.set("mm-data",list);
     store.set("mm-extra",{logos:LOGOS,locals:LOCALS});
+    store.set("mm-when",Date.now());
     rebuildControls(); buildStores();
-    $("updated").textContent = "Precios y stock actualizados: "+new Date().toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+    $("updated").textContent = "Precios y stock actualizados: "+fmtWhen(Date.now());
+    $("stale").hidden=true;
   }catch(e){
     /* Se queda con la última copia guardada y lo avisa */
-    const st=$("stale");
-    st.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span>No pudimos actualizar los precios en este momento. Te mostramos la última lista guardada; confirma el precio al consultar.</span>`;
-    st.hidden=false;
+    showStale();
   }
 }
+const fmtWhen = t => new Date(t).toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+function showStale(){
+  const st=$("stale"), when=store.get("mm-when",0), off=navigator.onLine===false;
+  const ago = when ? ` (${fmtWhen(when)})` : "";
+  st.classList.toggle("offline",off);
+  st.innerHTML = off
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8.5 16.1a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg><span>Estás sin conexión. Te mostramos la lista guardada${ago}. Puedes escribirnos igual: WhatsApp enviará tu mensaje cuando vuelva la señal.</span>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span>No pudimos actualizar los precios en este momento. Te mostramos la última lista guardada${ago}; confirma el precio al consultar.</span>`;
+  st.hidden=false;
+}
+{ const w=store.get("mm-when",0); if(w) $("updated").textContent="Precios y stock actualizados: "+fmtWhen(w); }
+window.addEventListener("offline",showStale);
+window.addEventListener("online",()=>{ $("stale").hidden=true; loadSheet(); });
 loadSheet();
+/* Copia para ver el catálogo sin señal (solo en la página publicada) */
+if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
