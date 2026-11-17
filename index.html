@@ -84,9 +84,10 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .top{background:var(--brand);color:var(--brand-ink)}
 .checker{height:10px;background:conic-gradient(#111 25%,#fff 0 50%,#111 0 75%,#fff 0) 0 0/20px 20px;opacity:.9}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:16px;flex-wrap:wrap}
-.brand{display:flex;flex-direction:column;line-height:1}
-.brand b{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.01em;text-transform:uppercase}
-.brand span{font-size:13px;opacity:.92;margin-top:5px;text-wrap:balance}
+.brand{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.01em;text-transform:uppercase}
+.brand-logo{display:block;height:84px;width:auto;max-width:100%;filter:drop-shadow(0 2px 6px rgba(80,0,0,.28))}
+.brand span{font-size:13px;opacity:.92;margin-top:6px;text-wrap:balance}
 .open-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600}
 .open-pill i{width:8px;height:8px;border-radius:50%;background:#7CFFB0;box-shadow:0 0 0 3px rgba(124,255,176,.25)}
 .open-pill.closed i{background:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.25)}
@@ -328,7 +329,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .tab[aria-current="page"]{color:var(--brand)}
 
 /* Aviso breve */
-.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-120%);z-index:80;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform 320ms cubic-bezier(.2,.9,.3,1)}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,calc(-100% - 48px));z-index:80;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform 320ms cubic-bezier(.2,.9,.3,1)}
 .toast.on{transform:translate(-50%,0)}
 
 /* Pie */
@@ -348,7 +349,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   .price b{font-size:22px}
   .actions{flex-direction:column}
   .actions .wa{width:100%;padding:8px 10px;font-size:14px}
-  .brand b{font-size:26px}
+  .brand-logo{height:auto;width:min(300px,100%)}
   .btn-filter .lbl-txt{display:none}
   .badge{font-size:10.5px}
   .fin-sum b{font-size:15px}
@@ -375,7 +376,8 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   <div class="checker" aria-hidden="true"></div>
   <div class="wrap">
     <div class="brand">
-      <b>Malhuayza Motors</b>
+      <img class="brand-logo" src="https://lh3.googleusercontent.com/d/1X8wtb90CDpkS4If8dAMTLLbuukfv2N__=w640" width="420" height="117" alt="Malhuayza Motors Racing · La casa del motociclista" fetchpriority="high" onerror="this.nextElementSibling.hidden=false;this.remove()">
+      <b class="brand-name" hidden>Malhuayza Motors</b>
       <span>Motos, scooters, trimotos y cuatrimotos · Huamanga, Ayacucho</span>
     </div>
     <span class="open-pill" id="openPill"><i aria-hidden="true"></i><span id="openTxt">Lun–Sáb, 8 a. m. – 7 p. m.</span></span>
