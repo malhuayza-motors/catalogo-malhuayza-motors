@@ -221,6 +221,25 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .gal-dots i{width:7px;height:7px;border-radius:999px;background:rgba(22,24,27,.3);transition:width 220ms ease,background-color 220ms ease}
 .gal-dots i.on{width:20px;background:var(--brand)}
 .gal-count{position:absolute;top:10px;right:10px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:999px;background:rgba(22,24,27,.72);color:#fff}
+.gal .gallery img{cursor:zoom-in}
+.gal-zoom{position:absolute;top:8px;left:8px;display:inline-flex;align-items:center;gap:5px;min-height:32px;border:0;border-radius:999px;padding:5px 10px 5px 8px;font-size:12px;font-weight:700;cursor:pointer;background:rgba(22,24,27,.72);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background-color 150ms ease,transform 120ms ease-out}
+.gal-zoom:hover{background:var(--brand)}
+.gal-zoom:active{transform:scale(.95)}
+.lb{position:fixed;inset:0;z-index:90;background:#0b0c0d;animation:lbIn 200ms ease-out}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
+.lb .gal,.lb .gallery{height:100%;border-radius:0}
+.lb .gallery{align-items:center}
+.lb .gallery img{height:100%;aspect-ratio:auto;object-fit:contain;background:transparent;border-radius:0;cursor:default}
+.lb .gal-btn{width:52px;height:52px;margin-top:-26px;background:rgba(22,24,27,.66);border:1px solid rgba(255,255,255,.28)}
+.lb .gal-btn:hover{background:var(--brand)}
+.lb .gal-btn.prev{left:14px}
+.lb .gal-btn.next{right:14px}
+.lb .gal-count{top:auto;bottom:18px;right:auto;left:16px;background:rgba(255,255,255,.14);font-size:13px}
+.lb .gal-dots{bottom:24px}
+.lb .gal-dots i{background:rgba(255,255,255,.35)}
+.lb .gal-dots i.on{background:#fff}
+.lb-x{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:2;width:48px;height:48px;border:1px solid rgba(255,255,255,.28);border-radius:50%;font-size:26px;line-height:1;cursor:pointer;background:rgba(22,24,27,.66);color:#fff;transition:background-color 150ms ease}
+.lb-x:hover{background:var(--brand)}
 @media (hover:none){.gal-btn{width:38px;height:38px;margin-top:-19px;background:rgba(22,24,27,.55)}}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.01em}
@@ -625,6 +644,8 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Fotos en pantalla completa" hidden></div>
 
 <div class="modal" id="modal">
   <div class="scrim" id="scrim"></div>
@@ -1054,10 +1075,12 @@ function scrollToResults(){
 /* ================= GALERÍA DE FOTOS ================= */
 /* Flechas para pasar las fotos (útiles en computadora) y puntos que indican cuál foto se ve */
 const ARROW = d => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d<0?"m15 5-7 7 7 7":"m9 5 7 7-7 7"}"/></svg>`;
-function galleryHtml(ids,alt,cover){
+const ZOOM = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`;
+function galleryHtml(ids,alt,cover,full){
   const n=ids.length;
-  return `<div class="gal${cover?" cover":""}">
-    <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>imgTag(p,1200,`${alt} – foto ${i+1}`,i>0)).join("")}</div>
+  return `<div class="gal${cover?" cover":""}${full?" lb-gal":""}" data-ids="${esc(ids.join(" "))}" data-alt="${esc(alt)}">
+    <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>imgTag(p,full?1600:1200,`${alt} – foto ${i+1}`,i>0)).join("")}</div>
+    ${full?"":`<button class="gal-zoom" type="button" data-zoom aria-label="Ver fotos en pantalla completa">${ZOOM}<span>Ampliar</span></button>`}
     ${n>1?`<button class="gal-btn prev" type="button" data-gal="-1" aria-label="Foto anterior" hidden>${ARROW(-1)}</button>
     <button class="gal-btn next" type="button" data-gal="1" aria-label="Foto siguiente">${ARROW(1)}</button>
     <div class="gal-dots" aria-hidden="true">${ids.map((_,i)=>`<i${i?"":' class="on"'}></i>`).join("")}</div>
@@ -1079,6 +1102,24 @@ function bindGalleries(root){
     track.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"){e.preventDefault();go(1);} if(e.key==="ArrowLeft"){e.preventDefault();go(-1);} });
     sync();
   });
+}
+/* Pantalla completa: las mismas fotos en grande, con flechas, puntos y contador */
+const LB = {open:false,pushed:false,trigger:null};
+function openLightbox(ids,alt,start,trigger){
+  const lb=$("lb");
+  lb.innerHTML=`<button class="lb-x" type="button" data-lb-close aria-label="Cerrar pantalla completa">×</button>${galleryHtml(ids,alt,false,true)}`;
+  lb.hidden=false; LB.open=true; LB.trigger=trigger||null;
+  try{ history.pushState({lb:1},""); LB.pushed=true; }catch(e){}
+  const tr=lb.querySelector(".gallery");
+  bindGalleries(lb);
+  requestAnimationFrame(()=>{ tr.scrollLeft=start*(tr.clientWidth+8); tr.focus({preventScroll:true}); });
+  track("ampliar_foto",{modelo:alt});
+}
+function closeLightbox(fromHistory){
+  if(!LB.open) return;
+  LB.open=false; $("lb").hidden=true; $("lb").innerHTML="";
+  if(LB.pushed){ LB.pushed=false; if(!fromHistory){ LB.skipPop=true; history.back(); } }
+  if(LB.trigger&&document.contains(LB.trigger)) LB.trigger.focus({preventScroll:true});
 }
 
 /* ================= DETALLE DE MOTO ================= */
@@ -1395,13 +1436,16 @@ $("stores").addEventListener("click",e=>{const b=e.target.closest("[data-store]"
 $("scrim").addEventListener("click",()=>closeSheet());
 $("sheet").addEventListener("click",e=>{
   if(e.target.closest("[data-close]")){closeSheet();return;}
+  const zg=e.target.closest("[data-zoom], .gal .gallery img"); if(zg){ const g=zg.closest(".gal"); const tr=g.querySelector(".gallery");
+    openLightbox(g.dataset.ids.split(" "),g.dataset.alt,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)),zg); return; }
   const cp=e.target.closest("[data-copy]"); if(cp){track("copiar_enlace");copyText(cp.dataset.copy);return;}
   const cs=e.target.closest("[data-consult]"); if(cs){const d=DATA[+cs.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),SH.trigger);return;}
   if(e.target.closest("[data-send-favs]")){openSheet(contactSheet(favsMsg(),"Mi selección"),SH.trigger);return;}
   const fv=e.target.closest("[data-fav-sheet]"); if(fv){toggleFav(fv.dataset.favSheet);const on=favs.has(fv.dataset.favSheet);fv.textContent=on?"✓ Me interesa":"♡ Me interesa";fv.setAttribute("aria-pressed",on);return;}
   const cl=e.target.closest("[data-calc]"); if(cl){const k=cl.dataset.calc;SH.pushed=false;closeSheet(0,true);FIN.init=0;setFinVehicle(k);goView("financiamiento");return;}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; if(LB.open){closeLightbox();return;} closeSheet(); });
+$("lb").addEventListener("click",e=>{ if(e.target.closest("[data-lb-close]")||e.target===$("lb")||e.target.classList.contains("gallery")) closeLightbox(); });
 
 $("trayCmp").addEventListener("click",e=>openSheet(compareSheet(),e.currentTarget));
 $("trayWa").addEventListener("click",e=>openSheet(contactSheet(favsMsg(),"Mi selección"),e.currentTarget));
@@ -1422,7 +1466,7 @@ const onScroll=()=>barEl.classList.toggle("scrolled",$("v-catalogo").classList.c
 window.addEventListener("scroll",onScroll,{passive:true});
 window.addEventListener("hashchange",route);
 /* El botón Atrás del celular cierra la hoja abierta en vez de salir de la página */
-window.addEventListener("popstate",()=>{ if($("modal").classList.contains("open")&&!SH.closing){ SH.pushed=false; closeSheet(0,true); } });
+window.addEventListener("popstate",()=>{ if(LB.skipPop){ LB.skipPop=false; return; } if(LB.open){ LB.pushed=false; closeLightbox(true); return; } if($("modal").classList.contains("open")&&!SH.closing){ SH.pushed=false; closeSheet(0,true); } });
 
 renderCatalog(); renderFin(); renderTray(); route(); onScroll();
 
