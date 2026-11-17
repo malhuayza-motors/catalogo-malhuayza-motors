@@ -189,6 +189,11 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .badge.order{background:var(--wait-soft);color:var(--wait)}
 .badge.new{background:var(--new-soft);color:var(--new)}
 .badge.last{background:var(--brand-soft);color:var(--brand)}
+.badge.deal{background:var(--brand);color:var(--brand-ink)}
+.price del{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.incl ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.incl li{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}
+.incl svg{flex:none;color:var(--ok);margin-top:1px}
 .fav{position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:50%;border:0;background:var(--glass-strong);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .fav svg{width:19px;height:19px}
 .fav[aria-pressed="true"]{color:var(--brand)}
@@ -533,13 +538,15 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   <div class="wrap block">
     <div class="block-head"><div><h2 class="section-title">Preguntas frecuentes</h2></div></div>
     <div class="faq">
+      <details><summary>¿Qué incluye la compra?</summary><p>Con cada vehículo te incluimos el trámite de la placa y de la tarjeta de propiedad virtual (TIVE), 1 casco básico (según modelo) y 1 año de garantía. Además, trabajamos marcas con repuestos originales disponibles en nuestra tienda, para que tu moto no se quede parada.</p></details>
       <details><summary>¿Puedo comprar en cuotas?</summary><p>Sí, con financiamiento Global Go. Das una cuota inicial (desde el 20 % del precio, aproximadamente) y pagas semanalmente a 12, 18 o 24 meses. También puedes adelantar y pagar el mes completo. Usa la pestaña Financiamiento para calcular tu cuota aproximada.</p></details>
       <details><summary>¿Qué opción de financiamiento conviene más?</summary><p>A 12 meses pagas una cuota más alta, pero es la opción con menos intereses en total. A 18 y 24 meses la cuota baja, pero el total pagado sube.</p></details>
       <details><summary>¿El SOAT está incluido?</summary><p>Puedes elegir: incluirlo en el financiamiento o sacarlo por tu cuenta. Incluirlo sube un poco la cuota semanal.</p></details>
       <details><summary>¿Cuánto demora la placa y la tarjeta de propiedad?</summary><p>Te enviamos la Tarjeta de Propiedad Virtual (TIVE) en PDF; guárdala en Google Drive, iCloud o tu correo. Nosotros hacemos el trámite de la placa y la recogemos por ti: está lista en unos 7 días hábiles en nuestra tienda de Jr. Américo Oré 155.</p></details>
       <details><summary>¿Dónde veo todos los colores de una moto?</summary><p>En la tienda de Av. La Victoria 268 (a espaldas del Plaza Vea) tenemos más espacio y la mayoría de colores disponibles. En las otras sedes exhibimos un modelo de cada uno.</p></details>
-      <details><summary>¿Tienen repuestos y taller?</summary><p>Sí. Repuestos y accesorios en la tienda principal (Jr. Américo Oré 155) y taller al frente, en Jr. Américo Oré 145. Escribe al WhatsApp de repuestos y taller para agendar tu mantenimiento.</p></details>
-      <details><summary>¿Qué significa “A pedido”?</summary><p>El modelo no está ahora en tienda, pero lo pedimos para ti. Escríbenos y te confirmamos el tiempo de llegada.</p></details>
+      <details><summary>¿Tienen repuestos y taller?</summary><p>Sí. Repuestos originales de las marcas que vendemos, y accesorios, en la tienda principal (Jr. Américo Oré 155) y taller al frente, en Jr. Américo Oré 145. Escribe al WhatsApp de repuestos y taller para agendar tu mantenimiento.</p></details>
+      <details><summary>¿Qué significa “A pedido”?</summary><p>El modelo no está ahora en tienda, pero lo pedimos para ti. Escríbenos y te confirmamos el tiempo de llegada. Si la ficha indica el año (por ejemplo, “Año 2023/24”), es el año de fabricación de esas unidades.</p></details>
+      <details><summary>¿Qué es un “Precio especial”?</summary><p>Son unidades nuevas de años de fabricación anteriores que ofrecemos a un precio menor. En la ficha verás el precio especial y el precio de lista.</p></details>
     </div>
   </div>
 </section>
@@ -724,8 +731,9 @@ const toNum = v => { const t=String(v??"").replace(/[^\d,.]/g,""); if(!t) return
 function makeItem(o,i){
   const ld=parseDate(o.last);
   const colors=cleanColors(o.colors);
+  const nt=readNote(o.note,o.price);
   return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
-    colors,stock:o.stock,price:o.price,note:publicNote(o.note||""),last:ld,sedes:o.sedes||"",photos:o.photos||[],
+    colors,stock:o.stock,price:nt.offer||o.price,list:o.price,offer:!!nt.offer,note:nt.note,last:ld,sedes:o.sedes||"",photos:o.photos||[],
     isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
     isLast: o.stock===1,
     key: slug(o.brand+" "+o.model),
@@ -754,8 +762,13 @@ function parseCSV(text){
   if(f||row.length){ row.push(f); rows.push(row); }
   return rows;
 }
-/* Nunca mostrar precios mínimos internos ("hasta S/ ...") que puedan venir en la columna Nota */
-const publicNote = n => /hasta\s*s\/|s\/\s*\d/i.test(n) ? "" : n;
+/* Columna Nota: "hasta S/8,150" = precio especial de unidades de años anteriores; "AÑO 2023/24" = año del modelo */
+function readNote(n,price){
+  n=String(n||"").trim();
+  const m=/s\/\s*([\d.,]+)/i.exec(n);
+  const offer=m?parseInt(m[1].replace(/\D/g,""),10)||0:0;
+  return {offer: offer>0&&offer<price ? offer : 0, note: m ? "" : n.replace(/^a[ñn]o\b/i,"Año")};
+}
 function fromSheet(text){
   const rows=parseCSV(text); if(rows.length<2) return [];
   const H=rows[0].map(h=>norm(h.trim()));
@@ -775,7 +788,7 @@ function fromSheet(text){
   LOGOS=logos; LOCALS=locals;
   return rows.slice(1).map(r=>{
     return {brand:g(r,"brand").toUpperCase(),model:g(r,"model"),type:g(r,"type"),cc:g(r,"cc"),colors:g(r,"colors"),
-      stock: toNum(g(r,"stock")), price:toNum(g(r,"price")), note:publicNote(g(r,"note")), last:g(r,"last"), sedes:g(r,"sedes"),
+      stock: toNum(g(r,"stock")), price:toNum(g(r,"price")), note:g(r,"note"), last:g(r,"last"), sedes:g(r,"sedes"),
       photos:g(r,"photos").split(/[\s,]+/).filter(Boolean)};
   });
 }
@@ -824,6 +837,13 @@ function contactSheet(msg,sub){
     <p class="note">Te respondemos de lunes a sábado, de 8:00 a. m. a 7:00 p. m.</p>`;
 }
 const pageBase = () => location.href.split("#")[0];
+/* Lo que incluye cada compra (se muestra en la ficha de cada vehículo) */
+const CHECK = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg>`;
+const INCLUDED = `<div class="incl"><div class="meta" style="margin-bottom:8px"><span>Incluido con tu compra</span></div><ul>
+  <li>${CHECK}<span>Trámite de placa y tarjeta de propiedad virtual (TIVE)</span></li>
+  <li>${CHECK}<span>1 casco básico (según modelo)</span></li>
+  <li>${CHECK}<span>1 año de garantía</span></li>
+  <li>${CHECK}<span>Repuestos originales de la marca en nuestra tienda</span></li></ul></div>`;
 
 /* Horario: Lun–Sáb 8:00–19:00 hora de Lima (UTC−5) */
 function openStatus(){
@@ -900,7 +920,7 @@ function filtered(){
 function weeklyFrom(price){ const init=Math.ceil(price*MIN_INIT/10)*10; const c=GG["0"][24]; return c[0]+c[1]*(price-init)+c[2]*price; }
 
 function badgesHtml(d){
-  return `<span class="badge ${d.stock?"stock":"order"}">${d.stock?"En tienda":"A pedido"}</span>`+
+  return (d.offer?`<span class="badge deal">Precio especial</span>`:"")+`<span class="badge ${d.stock?"stock":"order"}">${d.stock?"En tienda":"A pedido"}</span>`+
     (d.isNew?`<span class="badge new">Nuevo ingreso</span>`:"")+
     (d.isLast?`<span class="badge last">Última unidad</span>`:"");
 }
@@ -915,9 +935,9 @@ function card(d){
     <div class="card-body">
       <h2><button class="title-btn" type="button" data-open="${d.id}">${esc(d.model)}</button></h2>
       <div class="sub">${d.brand} · ${d.type}</div>
-      <div class="specs"><span class="spec">${d.cc}</span>${d.note?`<span class="spec">${d.note}</span>`:""}</div>
+      <div class="specs"><span class="spec">${d.cc}</span>${d.note?`<span class="spec">${esc(d.note)}</span>`:""}</div>
       <div class="colors">${sw||'<span class="more">Colores a consultar</span>'}${more}</div>
-      <div class="price-row"><div class="price"><small>Precio</small><b>${fmt(d.price)}</b><em>o desde ${fmt2(weeklyFrom(d.price))} por semana*</em></div></div>
+      <div class="price-row"><div class="price"><small>${d.offer?"Precio especial":"Precio"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Antes ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana*</em></div></div>
       <div class="actions">
         <button class="wa" type="button" data-consult="${d.id}">Consultar</button>
       </div>
@@ -971,18 +991,19 @@ function motoSheet(d){
     </div>
     ${d.photos.length?`<div class="gallery" aria-label="Fotos de ${esc(d.model)}">${d.photos.map((p,i)=>imgTag(p,1200,`${d.brand} ${d.model} – foto ${i+1}`,i>0)).join("")}</div>${d.photos.length>1?`<p class="more" style="margin:-4px 0 0;text-align:center">Desliza para ver las ${d.photos.length} fotos</p>`:""}`:""}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
-    <div class="price"><small>Precio de lista</small><b>${fmt(d.price)}</b><em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
+    <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
     <dl class="dl">
       <dt>Marca</dt><dd>${d.brand}</dd>
       <dt>Tipo</dt><dd>${d.type}</dd>
       <dt>${d.electric?"Potencia":"Cilindrada"}</dt><dd>${d.cc}</dd>
       <dt>Disponibilidad</dt><dd>${d.stock?`En tienda (${d.stock} ${d.stock===1?"unidad":"unidades"})`:"A pedido"}</dd>
       ${d.sedes?`<dt>Dónde verla</dt><dd>${esc(d.sedes).replace(/\n/g,"<br>")}</dd>`:""}
-      ${d.note?`<dt>Modelo</dt><dd>${d.note}</dd>`:""}
+      ${d.note?`<dt>Modelo</dt><dd>${esc(d.note)}</dd>`:""}
     </dl>
     <div><div class="meta" style="margin-bottom:6px"><span>Colores</span></div>
       <div class="color-list">${d.colors.length?d.colors.map(c=>`<span class="color-pill">${swatch(c)}${cap(c)}</span>`).join(""):'<span class="more">Consultar colores disponibles</span>'}</div>
     </div>
+    ${INCLUDED}
     <button class="wa" type="button" data-consult="${d.id}">Consultar por WhatsApp</button>
     <div class="btn-row">
       <button class="ghost" type="button" data-calc="${d.key}">Calcular cuotas</button>
