@@ -106,8 +106,9 @@ a{color:inherit}
 .brand-tile b{font-family:var(--font-display);font-size:24px;letter-spacing:.02em;line-height:1}
 .brand-tile small{font-size:11px;color:var(--muted);font-weight:600}
 .brand-tile.has-logo b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.brand-tile.has-logo{position:relative;justify-content:flex-end;padding-bottom:6px}
+.brand-tile.has-logo{position:relative;justify-content:center;gap:4px}
 .brand-tile[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.brand-tile .logo{width:84%;height:46px;object-fit:contain;background:#fff;border-radius:8px;padding:3px 6px}
 
 /* Barra de búsqueda fija */
 .bar{position:sticky;top:0;z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid transparent;transition:box-shadow 200ms ease,border-color 200ms ease;margin-top:14px}
@@ -168,6 +169,7 @@ a{color:inherit}
 .gallery{flex:none;width:100%;min-height:0;display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;border-radius:14px}
 .gallery::-webkit-scrollbar{display:none}
 .gallery img{flex:0 0 100%;width:100%;min-width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:14px;scroll-snap-align:center}
+.gallery.cover img{object-fit:cover;aspect-ratio:16/10}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.01em}
 .badge.stock{background:var(--ok-soft);color:var(--ok)}
@@ -213,7 +215,10 @@ a{color:inherit}
 .store:active{transform:scale(.985)}
 .store-photo{aspect-ratio:16/8;background:linear-gradient(135deg,var(--brand),#7d0d11);position:relative;color:#fff;display:flex;align-items:flex-end;padding:12px}
 .store-photo::before{content:"";position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.18) 25%,transparent 0 50%,rgba(0,0,0,.18) 0 75%,transparent 0) 0 0/28px 28px;opacity:.5}
-.store-photo b{position:relative;font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase}
+.store-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.store-photo.has-img::before{z-index:1;background:linear-gradient(to top,rgba(0,0,0,.65),rgba(0,0,0,0) 65%);opacity:1}
+.store-photo small{z-index:2}
+.store-photo b{z-index:2;position:relative;font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase}
 .store-photo small{position:absolute;top:12px;left:12px;font-size:12px;font-weight:700;background:rgba(0,0,0,.28);padding:3px 8px;border-radius:999px}
 .store-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
 .store-body .addr{font-weight:700}
@@ -709,6 +714,7 @@ function makeItem(o,i){
 }
 const FALLBACK = RAW.map(([brand,model,type,cc,colors,stock,price,note,last])=>({brand,model,type,cc,colors,stock,price,note,last,sedes:""}));
 let DATA = [], BY_KEY = {};
+let LOGOS = {}, LOCALS = {};   // IDs de Drive: logo por marca y fotos por sede (carpetas LOGOS y FACHADA)
 function setData(list){
   DATA = list.filter(o=>o.brand&&o.model&&o.price>0).map(makeItem);
   BY_KEY = Object.fromEntries(DATA.map(d=>[d.key,d]));
@@ -737,6 +743,15 @@ function fromSheet(text){
     stock:col("unidades"),price:col("precio"),order:col("a pedido"),sedes:col("sedes"),note:col("nota"),last:col("fecha"),photos:col("fotos")};
   if(ix.brand<0||ix.model<0||ix.price<0) return [];
   const g=(r,k)=>ix[k]>=0?(r[ix[k]]||"").trim():"";
+  const iLogo=col("logo"), iLocal=col("local"), iLocalImg=col("imagenes");
+  const logos={}, locals={};
+  rows.slice(1).forEach(r=>{
+    const b=(r[ix.brand]||"").trim().toUpperCase(), lg=iLogo>=0?(r[iLogo]||"").trim().split(/\s+/)[0]:"";
+    if(b&&lg) logos[b]=lg;
+    const ln=iLocal>=0?(r[iLocal]||"").trim():"", li=iLocalImg>=0?(r[iLocalImg]||"").trim():"";
+    if(ln&&li) locals[slug(ln)]=li.split(/[\s,]+/).filter(Boolean);
+  });
+  LOGOS=logos; LOCALS=locals;
   return rows.slice(1).map(r=>{
     const order=norm(g(r,"order"))==="si";
     return {brand:g(r,"brand").toUpperCase(),model:g(r,"model"),type:g(r,"type"),cc:g(r,"cc"),colors:g(r,"colors"),
@@ -745,6 +760,7 @@ function fromSheet(text){
   });
 }
 setData(store0().get("mm-data",null)||FALLBACK);
+{ const x=store0().get("mm-extra",null); if(x){ LOGOS=x.logos||{}; LOCALS=x.locals||{}; } }
 function store0(){ return {get(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }}; }
 
 const fmt = n => "S/ " + Math.round(n).toLocaleString("es-PE");
@@ -825,8 +841,9 @@ function buildCatalogControls(){
   const bc={};DATA.forEach(d=>bc[d.brand]=(bc[d.brand]||0)+1);
   const brands=Object.keys(bc).sort((a,b)=>bc[b]-bc[a]||a.localeCompare(b));
   $("brands").innerHTML = brands.map(b=>{
-    const logo=BRAND_LOGO[b];
-    return `<button class="brand-tile${logo?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false"${logo?` style="background-image:url('${logo}')"`:""}><b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
+    const logo=BRAND_LOGO[b], lid=LOGOS[b];
+    const img=lid&&!logo?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
+    return `<button class="brand-tile${logo||lid?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}"${logo?` style="background-image:url('${logo}')"`:""}>${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
   }).join("");
   $("fBrands").innerHTML = brands.slice().sort().map(b=>`<button class="pill" type="button" data-v="${b}" aria-pressed="false">${b}<small>${bc[b]}</small></button>`).join("");
   const maxP=Math.ceil(Math.max(...DATA.map(d=>d.price))/500)*500;
@@ -955,7 +972,7 @@ function motoSheet(d){
 function buildStores(){
   $("stores").innerHTML = STORES.map(s=>`
     <button class="store" type="button" data-store="${s.id}">
-      <div class="store-photo"><small>${s.tag}</small><b>${s.name}</b></div>
+      <div class="store-photo${(LOCALS[s.id]||[]).length?" has-img":""}">${(LOCALS[s.id]||[]).length?imgTag(LOCALS[s.id][0],800,""):""}<small>${s.tag}</small><b>${s.name}</b></div>
       <div class="store-body">
         <span class="addr">${s.addr}</span>
         <span class="ref">${s.ref}</span>
@@ -972,7 +989,7 @@ function storeSheet(s){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    <div class="photo-ph">Fotos del local próximamente</div>
+    ${(LOCALS[s.id]||[]).length?`<div class="gallery cover" aria-label="Fotos de ${esc(s.name)}">${LOCALS[s.id].map((p,i)=>imgTag(p,1200,`${s.name} – foto ${i+1}`,i>0)).join("")}</div>${LOCALS[s.id].length>1?`<p class="more" style="margin:-4px 0 0;text-align:center">Desliza para ver las ${LOCALS[s.id].length} fotos</p>`:""}`:`<div class="photo-ph">Fotos del local próximamente</div>`}
     <dl class="dl">
       <dt>Dirección</dt><dd><b>${s.addr}</b>, Huamanga</dd>
       <dt>Referencia</dt><dd>${s.ref}</dd>
@@ -1262,7 +1279,8 @@ async function loadSheet(){
     if(list.length<5) throw new Error("pocos datos");
     setData(list);
     store.set("mm-data",list);
-    rebuildControls();
+    store.set("mm-extra",{logos:LOGOS,locals:LOCALS});
+    rebuildControls(); buildStores();
     $("updated").textContent = "Precios y stock actualizados: "+new Date().toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
   }catch(e){ /* se queda con la última copia guardada */ }
 }
