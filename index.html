@@ -209,6 +209,19 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .gallery::-webkit-scrollbar{display:none}
 .gallery img{flex:0 0 100%;width:100%;min-width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:14px;scroll-snap-align:center}
 .gallery.cover img{object-fit:cover;aspect-ratio:16/10}
+.gal{position:relative;flex:none}
+.gal-btn{position:absolute;top:50%;width:44px;height:44px;margin-top:-22px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(22,24,27,.72);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform 160ms ease-out,background-color 150ms ease,opacity 200ms ease}
+.gal-btn.prev{left:10px}
+.gal-btn.next{right:10px}
+.gal-btn:hover{background:var(--brand)}
+.gal-btn:active{transform:scale(.92)}
+.gal-btn.next:not([hidden]){animation:nudgeR 1.6s cubic-bezier(.3,0,.2,1) 0.6s 2}
+@keyframes nudgeR{0%,100%{transform:translateX(0)}40%{transform:translateX(5px)}}
+.gal-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.gal-dots i{width:7px;height:7px;border-radius:999px;background:rgba(22,24,27,.3);transition:width 220ms ease,background-color 220ms ease}
+.gal-dots i.on{width:20px;background:var(--brand)}
+.gal-count{position:absolute;top:10px;right:10px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:999px;background:rgba(22,24,27,.72);color:#fff}
+@media (hover:none){.gal-btn{width:38px;height:38px;margin-top:-19px;background:rgba(22,24,27,.55)}}
 .badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
 .badge{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.01em}
 .badge.stock{background:var(--ok-soft);color:var(--ok)}
@@ -394,6 +407,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   *{scroll-behavior:auto!important;animation:none!important}
   .wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.feat-card:active,.card:has(.card-img:active),.store:active{transform:none}
   .filters{transform:none!important}
+  .gal-btn.next{animation:none!important}
   .toast{transition:opacity 150ms ease}
 }
 </style>
@@ -404,7 +418,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   <div class="checker" aria-hidden="true"></div>
   <div class="wrap">
     <div class="brand">
-      <img class="brand-logo" src="https://lh3.googleusercontent.com/d/1X8wtb90CDpkS4If8dAMTLLbuukfv2N__=w640" width="420" height="117" alt="Malhuayza Motors Racing · La casa del motociclista" fetchpriority="high" onerror="this.nextElementSibling.hidden=false;this.remove()">
+      <img class="brand-logo" src="logo-malhuayza.webp" width="420" height="117" alt="Malhuayza Motors Racing · La casa del motociclista" fetchpriority="high" onerror="this.nextElementSibling.hidden=false;this.remove()">
       <b class="brand-name" hidden>Malhuayza Motors</b>
       <span>Motos, scooters, trimotos y cuatrimotos · Huamanga, Ayacucho</span>
     </div>
@@ -1037,6 +1051,36 @@ function scrollToResults(){
   window.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
 }
 
+/* ================= GALERÍA DE FOTOS ================= */
+/* Flechas para pasar las fotos (útiles en computadora) y puntos que indican cuál foto se ve */
+const ARROW = d => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d<0?"m15 5-7 7 7 7":"m9 5 7 7-7 7"}"/></svg>`;
+function galleryHtml(ids,alt,cover){
+  const n=ids.length;
+  return `<div class="gal${cover?" cover":""}">
+    <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>imgTag(p,1200,`${alt} – foto ${i+1}`,i>0)).join("")}</div>
+    ${n>1?`<button class="gal-btn prev" type="button" data-gal="-1" aria-label="Foto anterior" hidden>${ARROW(-1)}</button>
+    <button class="gal-btn next" type="button" data-gal="1" aria-label="Foto siguiente">${ARROW(1)}</button>
+    <div class="gal-dots" aria-hidden="true">${ids.map((_,i)=>`<i${i?"":' class="on"'}></i>`).join("")}</div>
+    <span class="gal-count" aria-live="polite">1 / ${n}</span>`:""}
+  </div>`;
+}
+function bindGalleries(root){
+  root.querySelectorAll(".gal").forEach(g=>{
+    const track=g.querySelector(".gallery"), prev=g.querySelector(".prev"), next=g.querySelector(".next");
+    if(!prev) return;
+    const dots=[...g.querySelectorAll(".gal-dots i")], count=g.querySelector(".gal-count"), n=dots.length;
+    const idx=()=>Math.round(track.scrollLeft/Math.max(1,track.clientWidth+8));
+    const sync=()=>{ const i=Math.min(n-1,Math.max(0,idx())); prev.hidden=i<=0; next.hidden=i>=n-1;
+      dots.forEach((d,k)=>d.classList.toggle("on",k===i)); count.textContent=`${i+1} / ${n}`; };
+    const go=dir=>{ const i=Math.min(n-1,Math.max(0,idx()+dir));
+      track.scrollTo({left:i*(track.clientWidth+8),behavior:REDUCED.matches?"auto":"smooth"}); };
+    track.addEventListener("scroll",()=>{ cancelAnimationFrame(track._r); track._r=requestAnimationFrame(sync); },{passive:true});
+    prev.addEventListener("click",()=>go(-1)); next.addEventListener("click",()=>go(1));
+    track.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"){e.preventDefault();go(1);} if(e.key==="ArrowLeft"){e.preventDefault();go(-1);} });
+    sync();
+  });
+}
+
 /* ================= DETALLE DE MOTO ================= */
 function motoSheet(d){
   const shareUrl = pageBase()+"#moto-"+d.key;
@@ -1048,7 +1092,7 @@ function motoSheet(d){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    ${d.photos.length?`<div class="gallery" aria-label="Fotos de ${esc(d.model)}">${d.photos.map((p,i)=>imgTag(p,1200,`${d.brand} ${d.model} – foto ${i+1}`,i>0)).join("")}</div>${d.photos.length>1?`<p class="more" style="margin:-4px 0 0;text-align:center">Desliza para ver las ${d.photos.length} fotos</p>`:""}`:""}
+    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false):""}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
     <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
     <dl class="dl">
@@ -1093,7 +1137,7 @@ function storeSheet(s){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    ${(LOCALS[s.id]||[]).length?`<div class="gallery cover" aria-label="Fotos de ${esc(s.name)}">${LOCALS[s.id].map((p,i)=>imgTag(p,1200,`${s.name} – foto ${i+1}`,i>0)).join("")}</div>${LOCALS[s.id].length>1?`<p class="more" style="margin:-4px 0 0;text-align:center">Desliza para ver las ${LOCALS[s.id].length} fotos</p>`:""}`:`<div class="photo-ph">Fotos del local próximamente</div>`}
+    ${(LOCALS[s.id]||[]).length?galleryHtml(LOCALS[s.id],s.name,true):`<div class="photo-ph">Fotos del local próximamente</div>`}
     <dl class="dl">
       <dt>Dirección</dt><dd><b>${s.addr}</b>, Huamanga</dd>
       <dt>Referencia</dt><dd>${s.ref}</dd>
@@ -1215,7 +1259,7 @@ function openSheet(html,trigger){
   applySheet();
   springTo(0,{damping:1,response:.38});
   const c=$("sheet").querySelector("[data-close]"); if(c) c.focus({preventScroll:true});
-  bindDrag();
+  bindDrag(); bindGalleries($("sheet"));
 }
 function closeSheet(velocity=0,fromHistory=false){
   if(!$("modal").classList.contains("open")||SH.closing) return;
