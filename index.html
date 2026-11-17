@@ -83,6 +83,9 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 /* Encabezado */
 .top{background:var(--brand);color:var(--brand-ink)}
 .checker{height:10px;background:conic-gradient(#111 25%,#fff 0 50%,#111 0 75%,#fff 0) 0 0/20px 20px;opacity:.9}
+/* Al cargar, la bandera a cuadros entra deslizándose una sola vez, como al cruzar la meta */
+.top .checker{animation:flagIn 1.3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes flagIn{from{background-position:-200px 0;opacity:0}to{background-position:0 0;opacity:.9}}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;padding-bottom:16px;flex-wrap:wrap}
 .brand{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
 .brand-name{font-family:var(--font-display);font-weight:800;font-size:30px;letter-spacing:.01em;text-transform:uppercase}
@@ -90,6 +93,8 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .brand span{font-size:13px;opacity:.92;margin-top:6px;text-wrap:balance}
 .open-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 11px;border-radius:999px;font-size:13px;font-weight:600}
 .open-pill i{width:8px;height:8px;border-radius:50%;background:#7CFFB0;box-shadow:0 0 0 3px rgba(124,255,176,.25)}
+.open-pill:not(.closed) i{animation:livePulse 1.8s ease-out 1.2s 3}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(124,255,176,.7)}100%{box-shadow:0 0 0 9px rgba(124,255,176,0)}}
 .open-pill.closed i{background:#ffd27a;box-shadow:0 0 0 3px rgba(255,210,122,.25)}
 
 /* Vistas */
@@ -259,6 +264,15 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .fav svg{width:19px;height:19px}
 .fav[aria-pressed="true"]{color:var(--brand)}
 .fav[aria-pressed="true"] svg path{fill:currentColor}
+.fav::after{content:"";position:absolute;inset:6px;border-radius:50%;border:2px solid var(--brand);opacity:0;pointer-events:none}
+.fav.pop svg{animation:heartPop 460ms cubic-bezier(.2,.9,.3,1.4)}
+.fav.pop::after{animation:heartRing 560ms ease-out}
+@keyframes heartPop{0%{transform:scale(1)}30%{transform:scale(1.4)}65%{transform:scale(.9)}100%{transform:scale(1)}}
+@keyframes heartRing{0%{transform:scale(.5);opacity:.85}100%{transform:scale(1.7);opacity:0}}
+.ghost.pop{animation:btnPop 380ms cubic-bezier(.2,.9,.3,1.4)}
+@keyframes btnPop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+#trayTxt{display:inline-block}
+#trayTxt.bump{animation:btnPop 380ms cubic-bezier(.2,.9,.3,1.4)}
 .card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
 .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .card h2{font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1;margin:0;text-transform:uppercase;overflow-wrap:anywhere}
@@ -281,11 +295,33 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .wa{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:999px;padding:9px 13px;white-space:nowrap;border:0;cursor:pointer}
 .ghost{min-height:44px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 12px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .primary{min-height:44px;border:0;background:var(--brand);color:var(--brand-ink);border-radius:999px;padding:11px 14px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.empty{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--muted)}
-.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
-.empty .ghost{margin-top:14px}
+.empty{grid-column:1/-1;text-align:center;padding:34px 16px 40px;color:var(--muted);display:flex;flex-direction:column;align-items:center}
+.empty b{display:block;color:var(--ink);font-family:var(--font-display);font-weight:800;font-size:28px;line-height:1;text-transform:uppercase;margin-bottom:8px;text-wrap:balance}
+.empty p{margin:0;max-width:44ch;text-wrap:pretty}
+.empty-flag{width:64px;height:auto;margin-bottom:12px;color:var(--ink);transform-origin:14% 92%;animation:flagWave 1.4s ease-in-out .2s 2}
+@keyframes flagWave{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(4deg)}}
+.empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
 .stale{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:var(--wait-soft);color:var(--wait);font-size:13.5px;font-weight:600}
 .stale svg{flex:none;margin-top:1px}
+
+/* Por qué Malhuayza: franja oscura de cierre con la bandera a cuadros */
+.why{position:relative;background:#16181b;color:#fff;padding:26px 0 24px;margin-top:4px;overflow:hidden}
+.why::before{content:"";position:absolute;inset:0;background:conic-gradient(rgba(255,255,255,.045) 25%,transparent 0 50%,rgba(255,255,255,.045) 0 75%,transparent 0) 0 0/28px 28px;pointer-events:none}
+.why .wrap{position:relative}
+.why .section-title em{font-style:normal;color:#ff4a50}
+.why .section-sub{color:rgba(255,255,255,.78)}
+.why-grid{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.why-item{display:flex;gap:12px;align-items:flex-start;background:#24272b;border-radius:var(--radius);padding:14px}
+.why-ic{flex:none;width:42px;height:42px;border-radius:12px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center}
+.why-ic svg{width:22px;height:22px}
+.why-item b{display:block;font-family:var(--font-display);font-weight:700;font-size:20px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;margin-bottom:3px}
+.why-item span{font-size:14px;color:rgba(255,255,255,.78);line-height:1.4}
+.why-cta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.why-cta .ghost{border-color:rgba(255,255,255,.3);color:#fff}
+.why-item{opacity:0;transform:translateY(10px);transition:opacity 420ms ease,transform 520ms cubic-bezier(.2,.8,.2,1)}
+.why.seen .why-item{opacity:1;transform:none}
+.why.seen .why-item:nth-child(2){transition-delay:60ms}.why.seen .why-item:nth-child(3){transition-delay:120ms}
+.why.seen .why-item:nth-child(4){transition-delay:180ms}.why.seen .why-item:nth-child(5){transition-delay:240ms}.why.seen .why-item:nth-child(6){transition-delay:300ms}
 
 /* Bandeja flotante: "Me interesa" y comparar */
 .tray{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);z-index:30;display:none;gap:8px;align-items:center;background:var(--ink);color:var(--bg);border-radius:999px;padding:6px 6px 6px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:calc(100% - 32px)}
@@ -438,6 +474,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   *{scroll-behavior:auto!important;animation:none!important}
   .wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.feat-card:active,.card:has(.card-img:active),.store:active{transform:none}
   .filters{transform:none!important}
+  .why-item{opacity:1;transform:none;transition:none}
   .gal-btn.next{animation:none!important}
   .toast{transition:opacity 150ms ease}
 }
@@ -551,6 +588,24 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
     <div class="grid" id="grid" aria-live="polite"></div>
     <p class="grid-note">*Cuota semanal aproximada a 24 meses, con 20 % de cuota inicial y sin SOAT.</p>
   </div>
+  <section class="why" id="why" aria-labelledby="t-why">
+    <div class="wrap">
+      <h2 class="section-title" id="t-why">Por qué <em>Malhuayza</em></h2>
+      <p class="section-sub">Te hablamos claro: precios a la vista y lo que de verdad incluye tu compra.</p>
+      <ul class="why-grid">
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h4M7 14h7"/></svg></span><div><b>Placa y TIVE por ti</b><span>Hacemos el trámite de la placa y la tarjeta de propiedad virtual. Tu placa está lista en unos 7 días hábiles.</span></div></li>
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15a8 8 0 0 1 16 0v2H4z"/><path d="M12 7v4M4 17h16"/></svg></span><div><b>Casco incluido</b><span>Cada vehículo sale con 1 casco básico (según modelo).</span></div></li>
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span><div><b>1 año de garantía</b><span>Compras tranquilo: tu vehículo nuevo tiene 1 año de garantía.</span></div></li>
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5z"/><circle cx="12" cy="12" r="3.2"/></svg></span><div><b>Repuestos originales</b><span>Trabajamos marcas estables con repuestos originales en tienda, para que tu moto no se quede parada esperando una pieza.</span></div></li>
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></span><div><b>Taller propio</b><span>Mantenimiento y reparación en Jr. Américo Oré 145, al frente de la tienda principal.</span></div></li>
+      <li class="why-item"><span class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg></span><div><b>Cuotas semanales</b><span>Financiamiento con Global Go: inicial desde el 20 % y pagos a 12, 18 o 24 meses.</span></div></li>
+      </ul>
+      <div class="why-cta">
+        <a class="primary" href="#tiendas">Visita nuestras tiendas</a>
+        <a class="ghost" href="#contacto">Escríbenos</a>
+      </div>
+    </div>
+  </section>
 </section>
 
 <!-- ============ TIENDAS ============ -->
@@ -1065,7 +1120,7 @@ function card(d){
 function renderCatalog(){
   const list=filtered();
   $("grid").innerHTML = list.length ? list.map(card).join("") :
-    `<div class="empty"><b>No encontramos modelos con esos filtros</b>Prueba con otra palabra o quita algún filtro.<br><button class="ghost" type="button" data-clear-all>Ver todo el catálogo</button></div>`;
+    emptyHtml();
   const tl=[...S.types].map(t=>TYPE_LABEL[t]), bl=[...S.brands];
   const short=a=>a.length>2?`${a.slice(0,2).join(", ")} +${a.length-2}`:a.join(", ");
   const parts=[short(tl),short(bl)].filter(Boolean);
@@ -1090,6 +1145,23 @@ function renderCatalog(){
   ].map(([k,l])=>`<button class="af" type="button" data-clear="${esc(k)}" aria-label="Quitar filtro ${esc(l)}">${esc(l)} ✕</button>`);
   if(af.length>1) af.push(`<button class="af" type="button" data-clear="all">Quitar todos</button>`);
   $("activeFilters").innerHTML=af.join("");
+}
+/* Sin resultados: explica qué pasó y ofrece una salida (quitar filtros, ver todo o preguntar por WhatsApp) */
+const FLAG = `<svg class="empty-flag" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 6v54" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M12 8h40v26H12z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M12 8h10v6.5H12zM32 8h10v6.5H32zM22 14.5h10V21H22zM42 14.5h10V21H42zM12 21h10v6.5H12zM32 21h10v6.5H32zM22 27.5h10V34H22zM42 27.5h10V34H42z" fill="currentColor"/></svg>`;
+let emptyT=0;
+function emptyHtml(){
+  const q=S.q.trim(), words=norm(q).split(/\s+/).filter(Boolean);
+  const nf=S.types.size+S.brands.size+S.ccs.size+S.avail.size+(S.max<+$("fPrice").max?1:0);
+  const alt = q&&nf ? DATA.filter(d=>words.every(w=>d.text.includes(w))).length : 0;
+  clearTimeout(emptyT); if(q) emptyT=setTimeout(()=>track("busqueda_sin_resultados",{termino:q.slice(0,60)}),1500);
+  return `<div class="empty" role="status">${FLAG}
+    <b>${alt?"Tus filtros lo esconden":q?`Aún no tenemos “${esc(q)}”`:"Ningún modelo con esos filtros"}</b>
+    <p>${alt?`Sí hay ${alt} modelo${alt>1?"s":""} con “${esc(q)}”, pero tus filtros los ocultan.`:q?"Revisa cómo está escrito o busca por marca o tipo. Si es un modelo que no está aquí, pregúntanos: quizá podamos pedirlo para ti.":"Prueba quitando algún filtro o subiendo el precio máximo."}</p>
+    <div class="empty-actions">
+      ${alt?`<button class="primary" type="button" data-clear-filters>Ver ${alt===1?"el modelo":`los ${alt} modelos`} sin filtros</button>`:""}
+      <button class="ghost" type="button" data-clear-all>Ver todo el catálogo</button>
+      ${q&&!alt?`<button class="wa" type="button" data-ask>Preguntar por WhatsApp</button>`:""}
+    </div></div>`;
 }
 function scrollToResults(){
   const y=$("bar").getBoundingClientRect().top+window.scrollY;
@@ -1296,6 +1368,11 @@ function toggleFav(key){
   store.set("mm-favs",[...favs]);
   document.querySelectorAll(`[data-fav="${key}"]`).forEach(b=>b.setAttribute("aria-pressed",favs.has(key)));
   renderTray();
+  if(favs.has(key)){
+    document.querySelectorAll(`[data-fav="${key}"],[data-fav-sheet="${key}"]`).forEach(b=>{ b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
+    const t=$("trayTxt"); t.classList.remove("bump"); void t.offsetWidth; t.classList.add("bump");
+    if(!store.get("mm-fav-tip",false)){ store.set("mm-fav-tip",true); toast("♥ Guardada en tu selección"); }
+  }
   if(navigator.vibrate) try{navigator.vibrate(8)}catch(e){}
 }
 function compareSheet(){
@@ -1414,9 +1491,9 @@ function bindDrag(){
 
 /* ================= AVISO BREVE ================= */
 let toastT=0;
-function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),1800); }
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),msg.length>30?3000:1800); }
 async function copyText(txt){
-  try{ await navigator.clipboard.writeText(txt); toast("Copiado ✓"); }
+  try{ await navigator.clipboard.writeText(txt); toast(/^https?:/.test(txt)?"Enlace copiado ✓ Pégalo en WhatsApp":"Dirección copiada ✓"); }
   catch(e){ toast("No se pudo copiar en este navegador"); }
 }
 
@@ -1441,7 +1518,7 @@ if(GA_ID){
 }
 let TRACK_CTX="";   // modelo o motivo del mensaje que se está por enviar
 document.addEventListener("click",e=>{
-  const a=e.target.closest("a.wa-item,a.primary"); if(!a) return;
+  const a=e.target.closest("a.wa-item,a.primary[href*='maps']"); if(!a) return;
   if(a.classList.contains("primary")) track("como_llegar",{sede:($("mTitle")||{}).textContent||""});
   else track("consultar_whatsapp",{contacto:(a.querySelector("b")||{}).textContent||"",modelo:a.closest("#contactList")?"Pestaña Contacto":TRACK_CTX});
 });
@@ -1472,6 +1549,8 @@ $("sort").addEventListener("change",e=>{S.sort=e.target.value;renderCatalog();})
 $("reset").addEventListener("click",()=>{clearAll();renderCatalog();});
 $("grid").addEventListener("click",e=>{
   if(e.target.closest("[data-clear-all]")){clearAll();S.q="";$("q").value="";renderCatalog();return;}
+  if(e.target.closest("[data-clear-filters]")){clearAll();renderCatalog();return;}
+  const ak=e.target.closest("[data-ask]"); if(ak){openSheet(contactSheet(`Hola Malhuayza Motors, estoy buscando: ${S.q.trim()}. ¿Lo tienen o lo pueden pedir?`,"Consulta de modelo"),ak);return;}
   const f=e.target.closest("[data-fav]"); if(f){toggleFav(f.dataset.fav);return;}
   const c=e.target.closest("[data-consult]"); if(c){const d=DATA[+c.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),c);return;}
   const b=e.target.closest("[data-open]"); if(b){ const d=DATA[+b.dataset.open]; track("ver_moto",{modelo:d.brand+" "+d.model,tipo:d.type}); openSheet(motoSheet(d),b); }
@@ -1516,6 +1595,8 @@ window.addEventListener("hashchange",route);
 window.addEventListener("popstate",()=>{ if(LB.skipPop){ LB.skipPop=false; return; } if(LB.open){ LB.pushed=false; closeLightbox(true); return; } if($("modal").classList.contains("open")&&!SH.closing){ SH.pushed=false; closeSheet(0,true); } });
 
 renderCatalog(); renderFin(); renderTray(); route(); onScroll();
+$("why").addEventListener("click",e=>{ const a=e.target.closest("a[href^='#']"); if(!a) return; e.preventDefault(); goView(a.getAttribute("href").slice(1)); });
+if("IntersectionObserver" in window){ const io=new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting){ x.target.classList.add("seen"); io.disconnect(); } }),{threshold:.15}); io.observe($("why")); } else $("why").classList.add("seen");
 
 /* Carga los datos al día desde la pestaña "Web" del Sheet */
 function rebuildControls(){
