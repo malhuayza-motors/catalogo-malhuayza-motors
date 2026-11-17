@@ -96,8 +96,11 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .view{display:none}
 .view.on{display:block;animation:fadeIn 220ms ease}
 @keyframes fadeIn{from{opacity:.0}to{opacity:1}}
-.section-title{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.05;margin:0;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
-.section-sub{margin:4px 0 0;color:var(--muted);font-size:14px}
+/* Escala tipográfica: titular de destacados > título de página > título de tarjeta > rótulo de sección > texto */
+.section-title{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,7.4vw,40px);line-height:.92;margin:0;text-transform:uppercase;letter-spacing:-.005em;text-wrap:balance}
+.section-title.sm{font-weight:700;font-size:17px;line-height:1.1;letter-spacing:.1em}
+.cur{font-size:.56em;font-weight:700;letter-spacing:0;margin-right:.12em;vertical-align:.08em}
+.section-sub{margin:8px 0 0;color:var(--muted);font-size:15px;max-width:60ch;text-wrap:pretty}
 [hidden]{display:none!important}
 .block{padding-top:16px;padding-bottom:2px}
 .block-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:10px}
@@ -122,7 +125,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .feat::before{content:"";position:absolute;inset:0;background:conic-gradient(rgba(255,255,255,.045) 25%,transparent 0 50%,rgba(255,255,255,.045) 0 75%,transparent 0) 0 0/28px 28px;pointer-events:none}
 .feat .wrap{position:relative}
 .feat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
-.feat-title{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,7.6vw,44px);line-height:.95;margin:0;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
+.feat-title{font-family:var(--font-display);font-weight:800;font-size:clamp(32px,9vw,56px);line-height:.9;margin:0;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
 .feat-title em{font-style:normal;color:#ff4a50}
 .feat-sub{margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.78)}
 .feat-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
@@ -137,7 +140,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .feat-card b{font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase;overflow-wrap:anywhere}
 .feat-card small{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em}
 .feat-card .pr{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
-.feat-card .pr strong{font-family:var(--font-display);font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.feat-card .pr strong{font-family:var(--font-display);font-size:40px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .feat-card .pr del{font-size:13px;color:rgba(255,255,255,.62)}
 .feat-card .go{margin-top:10px;font-size:13px;font-weight:700;color:#ff8d91}
 @media (hover:hover){.feat-card:hover .go{text-decoration:underline;text-underline-offset:3px}}
@@ -258,7 +261,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .fav[aria-pressed="true"] svg path{fill:currentColor}
 .card-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
 .meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.card h2{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1.05;margin:0;text-transform:uppercase;overflow-wrap:anywhere}
+.card h2{font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1;margin:0;text-transform:uppercase;overflow-wrap:anywhere}
 .title-btn{all:unset;cursor:pointer;display:block}
 .title-btn:focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:4px}
 .sub{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:-2px}
@@ -268,8 +271,10 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .sw{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.18);flex:none}
 .more{font-size:12px;color:var(--muted)}
 .price small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-.price b{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.01em}
-.price em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
+.price b{font-family:var(--font-display);font-size:34px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.01em}
+.price em{display:block;font-style:normal;font-size:12.5px;color:var(--muted);margin-top:4px}
+.price em strong{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.sheet .price b{font-size:46px}
 .price-row{margin-top:auto;padding-top:6px}
 .actions{display:flex;gap:8px}
 .actions .wa{flex:1}
@@ -301,7 +306,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .store-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .store-photo.has-img::before{z-index:1;background:linear-gradient(to top,rgba(0,0,0,.65),rgba(0,0,0,0) 65%);opacity:1}
 .store-photo small{z-index:2}
-.store-photo b{z-index:2;position:relative;font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase}
+.store-photo b{z-index:2;position:relative;font-family:var(--font-display);font-weight:800;font-size:32px;line-height:1;text-transform:uppercase}
 .store-photo small{position:absolute;top:12px;left:12px;font-size:12px;font-weight:700;background:rgba(0,0,0,.28);padding:3px 8px;border-radius:999px}
 .store-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
 .store-body .addr{font-weight:700}
@@ -328,13 +333,13 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .fin-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .fin-sum div{background:var(--bg);border-radius:10px;padding:10px}
 .fin-sum small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-.fin-sum b{font-variant-numeric:tabular-nums;font-size:17px}
+.fin-sum b{font-family:var(--font-display);font-weight:800;font-variant-numeric:tabular-nums;font-size:24px;line-height:1.1}
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .plan{border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;background:var(--surface)}
 .plan.best{border-color:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
 .plan .tag{position:absolute;top:-10px;right:10px;background:var(--ok);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px}
 .plan h4{margin:0;font-family:var(--font-display);font-size:22px;text-transform:uppercase}
-.plan .wk{font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1.05;letter-spacing:-.01em}
+.plan .wk{font-family:var(--font-display);font-size:40px;font-weight:800;color:var(--brand);font-variant-numeric:tabular-nums;line-height:1.05;letter-spacing:-.01em}
 .plan .wk small{font-family:var(--font-body);font-size:13px;color:var(--muted);font-weight:600;letter-spacing:0}
 .plan dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:8px 0 0;font-size:13px}
 .plan dt{color:var(--muted)}
@@ -348,7 +353,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted);transition:transform 200ms ease}
 .faq details[open] summary::after{transform:rotate(45deg)}
-.faq p{margin:0 0 14px;color:var(--muted);font-size:15px}
+.faq p{margin:0 0 14px;color:var(--muted);font-size:15px;max-width:65ch;text-wrap:pretty}
 
 /* Hoja inferior */
 .modal{position:fixed;inset:0;z-index:60;display:none}
@@ -363,7 +368,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
   .drag-zone{cursor:default;touch-action:auto;top:-18px;padding-top:18px;margin-top:-18px}
 }
 .sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.sheet h3{font-family:var(--font-display);font-size:30px;line-height:1;margin:4px 0 0;text-transform:uppercase;overflow-wrap:anywhere;text-wrap:balance}
+.sheet h3{font-family:var(--font-display);font-weight:800;font-size:clamp(32px,8.6vw,42px);line-height:.92;margin:4px 0 0;text-transform:uppercase;overflow-wrap:anywhere;text-wrap:balance}
 .close{border:1px solid var(--line);background:transparent;border-radius:999px;width:44px;height:44px;cursor:pointer;flex:none;font-size:20px;line-height:1}
 .dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:15px}
 .dl dt{color:var(--muted);font-weight:600}
@@ -408,18 +413,18 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .card-img{aspect-ratio:4/3}
   .card-body{padding:10px 10px 12px;gap:6px}
-  .card h2{font-size:18px}
+  .card h2{font-size:20px}
   .meta{font-size:10.5px}
-  .price b{font-size:22px}
+  .price b{font-size:27px}
   .actions{flex-direction:column}
   .actions .wa{width:100%;padding:8px 10px;font-size:14px}
   .brand-logo{height:auto;width:min(300px,100%)}
   .btn-filter .lbl-txt{display:none}
   .badge{font-size:10.5px}
-  .fin-sum b{font-size:15px}
+  .fin-sum b{font-size:19px}
   .feat-card .ph{aspect-ratio:16/11}
   .feat-card b{font-size:22px}
-  .feat-card .pr strong{font-size:30px}
+  .feat-card .pr strong{font-size:34px}
 }
 @media (prefers-reduced-transparency: reduce){
   .bar{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -466,11 +471,11 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
     </div>
   </div>
   <div class="wrap block">
-    <div class="block-head"><div><h2 class="section-title">Marcas</h2></div></div>
+    <div class="block-head"><div><h2 class="section-title sm">Marcas</h2></div></div>
     <div class="brands" id="brands" role="group" aria-label="Filtrar por marca"></div>
   </div>
   <div class="wrap block">
-    <div class="block-head"><div><h2 class="section-title">Explora por tipo</h2></div></div>
+    <div class="block-head"><div><h2 class="section-title sm">Explora por tipo</h2></div></div>
     <div class="types" id="types"></div>
   </div>
 
@@ -615,7 +620,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
     <div class="wa-list" id="contactList"></div>
   </div>
   <div class="wrap block">
-    <div class="block-head"><div><h2 class="section-title">Preguntas frecuentes</h2></div></div>
+    <div class="block-head"><div><h2 class="section-title sm">Preguntas frecuentes</h2></div></div>
     <div class="faq">
       <details><summary>¿Qué incluye la compra?</summary><p>Con cada vehículo te incluimos el trámite de la placa y de la tarjeta de propiedad virtual (TIVE), 1 casco básico (según modelo) y 1 año de garantía. Además, trabajamos marcas con repuestos originales disponibles en nuestra tienda, para que tu moto no se quede parada.</p></details>
       <details><summary>¿Puedo comprar en cuotas?</summary><p>Sí, con financiamiento Global Go. Das una cuota inicial (desde el 20 % del precio, aproximadamente) y pagas semanalmente a 12, 18 o 24 meses. También puedes adelantar y pagar el mes completo. Usa la pestaña Cuotas para calcular tu cuota aproximada.</p></details>
@@ -893,6 +898,7 @@ setData(store0().get("mm-data",null)||FALLBACK);
 function store0(){ return {get(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} }}; }
 
 const fmt = n => "S/ " + Math.round(n).toLocaleString("es-PE");
+const fmtP = n => `<span class="cur">S/</span>${Math.round(n).toLocaleString("es-PE")}`;   // precio grande: "S/" más pequeño
 const fmt2 = n => "S/ " + n.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 const cap = s => s.charAt(0)+s.slice(1).toLowerCase();
 const $ = id => document.getElementById(id);
@@ -1002,7 +1008,7 @@ function buildFeatured(){
   $("featRow").innerHTML = list.map(d=>`<button class="feat-card" type="button" data-open="${d.id}">
     <span class="ph">${icon(d.type)}${d.photos.length?imgTag(d.photos[0],600,d.brand+" "+d.model):""}<span class="tag${d.offer?"":" new"}">${d.offer?"Precio especial":"Nuevo ingreso"}</span></span>
     <span class="info"><b>${esc(d.model)}</b><small>${d.brand} · ${d.type} · ${d.cc}</small>
-      <span class="pr"><strong>${fmt(d.price)}</strong>${d.offer?`<del>${fmt(d.list)}</del>`:""}</span>
+      <span class="pr"><strong>${fmtP(d.price)}</strong>${d.offer?`<del>${fmt(d.list)}</del>`:""}</span>
       <span class="go">Ver ficha y colores →</span></span></button>`).join("");
 }
 
@@ -1049,7 +1055,7 @@ function card(d){
       <div class="sub">${d.brand} · ${d.type}</div>
       <div class="specs"><span class="spec">${d.cc}</span>${d.note?`<span class="spec">${esc(d.note)}</span>`:""}</div>
       <div class="colors">${sw||'<span class="more">Colores a consultar</span>'}${more}</div>
-      <div class="price-row"><div class="price"><small>${d.offer?"Precio especial":"Precio"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Antes ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana*</em></div></div>
+      <div class="price-row"><div class="price"><small>${d.offer?"Precio especial":"Precio"}</small><b>${fmtP(d.price)}</b>${d.offer?`<del>Antes ${fmt(d.list)}</del>`:""}<em>o desde <strong>${fmt2(weeklyFrom(d.price))}</strong> por semana*</em></div></div>
       <div class="actions">
         <button class="wa" type="button" data-consult="${d.id}">Consultar</button>
       </div>
@@ -1158,7 +1164,7 @@ function motoSheet(d){
     ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors):""}
     ${colorsBlock(d)}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
-    <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmt(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde ${fmt2(weeklyFrom(d.price))} por semana (aprox., 24 meses, 20 % de inicial)</em></div>
+    <div class="price"><small>${d.offer?"Precio especial por año del modelo":"Precio de lista"}</small><b>${fmtP(d.price)}</b>${d.offer?`<del>Precio de lista ${fmt(d.list)}</del>`:""}<em>o desde <strong>${fmt2(weeklyFrom(d.price))}</strong> por semana (aprox., 24 meses, 20 % de inicial)</em></div>
     <dl class="dl">
       <dt>Marca</dt><dd>${d.brand}</dd>
       <dt>Tipo</dt><dd>${d.type}</dd>
@@ -1269,7 +1275,7 @@ function renderFin(){
   $("plans").innerHTML = rows.map((r,idx)=>`
     <div class="plan${idx===0?" best":""}">${idx===0?'<span class="tag">Menos intereses</span>':""}
       <h4>${r.m} meses</h4>
-      <div class="wk">${fmt2(r.wk)} <small>/ semana</small></div>
+      <div class="wk"><span class="cur">S/</span>${r.wk.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2})} <small>/ semana</small></div>
       <dl><dt>Pago mensual aprox.</dt><dd>${fmt(r.month)}</dd><dt>Total en cuotas</dt><dd>${fmt(r.total)}</dd><dt>Intereses y cargos</dt><dd>${fmt(r.int)}</dd></dl>
     </div>`).join("");
   const d=BY_KEY[FIN.key];
