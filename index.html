@@ -488,8 +488,8 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 <section class="view" id="v-financiamiento" aria-labelledby="t-fin">
   <div class="wrap block">
     <div class="block-head"><div>
-      <h1 class="section-title" id="t-fin">Calcula tus cuotas</h1>
-      <p class="section-sub">Simulación aproximada con financiamiento Global Go. Pagos semanales a 12, 18 o 24 meses.</p>
+      <h1 class="section-title" id="t-fin">Compra en cuotas</h1>
+      <p class="section-sub">Financiamiento con Global Go: inicial desde el 20 % y pagos semanales a 12, 18 o 24 meses. Calcula tu cuota aproximada.</p>
     </div></div>
     <div class="fin-card">
       <div class="fin-grid">
@@ -539,7 +539,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
     <div class="block-head"><div><h2 class="section-title">Preguntas frecuentes</h2></div></div>
     <div class="faq">
       <details><summary>¿Qué incluye la compra?</summary><p>Con cada vehículo te incluimos el trámite de la placa y de la tarjeta de propiedad virtual (TIVE), 1 casco básico (según modelo) y 1 año de garantía. Además, trabajamos marcas con repuestos originales disponibles en nuestra tienda, para que tu moto no se quede parada.</p></details>
-      <details><summary>¿Puedo comprar en cuotas?</summary><p>Sí, con financiamiento Global Go. Das una cuota inicial (desde el 20 % del precio, aproximadamente) y pagas semanalmente a 12, 18 o 24 meses. También puedes adelantar y pagar el mes completo. Usa la pestaña Financiamiento para calcular tu cuota aproximada.</p></details>
+      <details><summary>¿Puedo comprar en cuotas?</summary><p>Sí, con financiamiento Global Go. Das una cuota inicial (desde el 20 % del precio, aproximadamente) y pagas semanalmente a 12, 18 o 24 meses. También puedes adelantar y pagar el mes completo. Usa la pestaña Cuotas para calcular tu cuota aproximada.</p></details>
       <details><summary>¿Qué opción de financiamiento conviene más?</summary><p>A 12 meses pagas una cuota más alta, pero es la opción con menos intereses en total. A 18 y 24 meses la cuota baja, pero el total pagado sube.</p></details>
       <details><summary>¿El SOAT está incluido?</summary><p>Puedes elegir: incluirlo en el financiamiento o sacarlo por tu cuenta. Incluirlo sube un poco la cuota semanal.</p></details>
       <details><summary>¿Cuánto demora la placa y la tarjeta de propiedad?</summary><p>Te enviamos la Tarjeta de Propiedad Virtual (TIVE) en PDF; guárdala en Google Drive, iCloud o tu correo. Nosotros hacemos el trámite de la placa y la recogemos por ti: está lista en unos 7 días hábiles en nuestra tienda de Jr. Américo Oré 155.</p></details>
@@ -566,7 +566,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   <nav aria-label="Menú principal">
     <a class="tab" href="#catalogo" data-view="catalogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Catálogo</a>
     <a class="tab" href="#tiendas" data-view="tiendas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Tiendas</a>
-    <a class="tab" href="#financiamiento" data-view="financiamiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>Financiamiento</a>
+    <a class="tab" href="#financiamiento" data-view="financiamiento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>Cuotas</a>
     <a class="tab" href="#contacto" data-view="contacto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z"/></svg>Contacto</a>
   </nav>
 </div>
@@ -580,12 +580,16 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 
 <script>
 /* ================= CONFIGURACIÓN ================= */
-/* Números que aparecen al tocar "Consultar" (código de país + número, sin espacios). Se muestran solo como "Contacto". */
+/* Números que aparecen al tocar "Consultar" (código de país + número, sin espacios), con la sede de cada uno. */
 const SALES = ["51989005413","51941052030"];
+const SALES_LABEL = {"51989005413":"Contacto · Américo Oré","51941052030":"Contacto · Mariscal Cáceres"};
 
 /* Enlace CSV de la pestaña "Web" publicada (Archivo → Compartir → Publicar en la Web).
    Si está vacío o falla, la página usa la última copia guardada o los datos de respaldo de abajo. */
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9CpWcPpaDjFhx02fPZ6XUo5EK4oh77hbo7fav8LDv3n1OAZPGr5ruVBXbLXGhcOBulwP_qwHR6228/pub?gid=100&single=true&output=csv";
+
+/* Contador de visitas (Google Analytics 4). Pega aquí el ID de medición "G-XXXXXXXXXX"; vacío = desactivado */
+const GA_ID = "";
 
 /* Fórmula aproximada de Global Go, ajustada con 5 simulaciones reales (error máximo ±S/1.50).
    cuota semanal = a + b × monto financiado + c × precio del vehículo */
@@ -602,24 +606,24 @@ const STORES = [
    locales:[["Tienda de vehículos y repuestos (2 tiendas)","Jr. Américo Oré 155 · Exhibimos un modelo de cada vehículo, más repuestos y accesorios."],
             ["Taller","Jr. Américo Oré 145 · Al frente de la tienda principal. Mantenimiento y reparación."]],
    tags:["Vehículos","Repuestos","Taller"],
-   wa:[["Contacto","51989005413"],["Contacto","51941052030"],["Repuestos y taller","51948741018"],["Gerencia","51948507711"]],
+   wa:[["Contacto · Américo Oré","51989005413"],["Repuestos y taller","51948741018"],["Gerencia","51948507711"]],
    maps:"https://maps.app.goo.gl/V3395DavFnwm31cu5"},
   {id:"la-victoria", name:"Sede La Victoria", tag:"La mayor exhibición",
    addr:"Av. La Victoria 268", ref:"A espaldas del Plaza Vea",
    locales:[["Tienda de vehículos","Nuestro local más amplio: más vehículos y la mayoría de colores disponibles."]],
    tags:["Vehículos","Todos los colores"],
-   wa:[["Contacto","51989005413"],["Contacto","51941052030"]],
+   wa:[["Contacto · Américo Oré","51989005413"],["Contacto · Mariscal Cáceres","51941052030"]],
    maps:"https://maps.app.goo.gl/YJgvNwH38XU1tKJh9"},
   {id:"mariscal-caceres", name:"Sede Mariscal Cáceres", tag:"Vehículos",
    addr:"Av. Mariscal Cáceres 509", ref:"A una cuadra del Parque Magdalena",
    locales:[["Tienda de vehículos","Exhibimos un modelo de cada vehículo."]],
    tags:["Vehículos"],
-   wa:[["Contacto","51941052030"],["Contacto","51989005413"]],
+   wa:[["Contacto · Mariscal Cáceres","51941052030"]],
    maps:"https://maps.app.goo.gl/1VoGaHgZTuB11uBL7"}
 ];
 const CONTACTS = [
-  ["Contacto","51989005413","Vehículos y financiamiento"],
-  ["Contacto","51941052030","Vehículos y financiamiento"],
+  ["Contacto · Américo Oré","51989005413","Vehículos y cuotas"],
+  ["Contacto · Mariscal Cáceres","51941052030","Vehículos y cuotas"],
   ["Repuestos y taller","51948741018","Jr. Américo Oré 155 y 145"],
   ["Gerencia","51948507711","Malhuayza Motors"]
 ];
@@ -709,7 +713,7 @@ const RAW = [
 
 /* ================= DATOS DERIVADOS ================= */
 const TYPE_ORDER = ["Scooter","Pistera","Urbana","Todoterreno","Utilitaria","Semiautomática","Custom","Aventura","Eléctrica","Trimoto pasajero","Trimoto carga","Cuatrimoto","Cuatricarga"];
-const TYPE_LABEL = {"Scooter":"Scooters","Pistera":"Pisteras","Urbana":"Urbanas","Todoterreno":"Todoterreno","Utilitaria":"Utilitarias","Semiautomática":"Semiautomáticas","Custom":"Custom","Aventura":"Aventura","Eléctrica":"Eléctricas","Trimoto pasajero":"Trimotos pasajero","Trimoto carga":"Trimotos carga","Cuatrimoto":"Cuatrimotos","Cuatricarga":"Cuatricargas"};
+const TYPE_LABEL = {"Scooter":"Scooters","Pistera":"Pisteras (deportivas)","Urbana":"Urbanas","Todoterreno":"Todoterreno","Utilitaria":"Utilitarias","Semiautomática":"Semiautomáticas","Custom":"Custom","Aventura":"Aventura","Eléctrica":"Eléctricas","Trimoto pasajero":"Trimotos pasajero","Trimoto carga":"Trimotos carga","Cuatrimoto":"Cuatrimotos","Cuatricarga":"Cuatricargas"};
 const COLOR_HEX = {NEGRO:"#17181a",BLANCO:"#f7f7f5",ROJO:"#d32027",AZUL:"#1f4fd6",GRIS:"#8b9098",PLATA:"#c4c8ce",VERDE:"#2f9e52",AMARILLO:"#f3c300",ANARANJADO:"#f27a12",NARANJA:"#f27a12",MORADO:"#7b3fb2",ROSADO:"#f39ac0",DORADO:"#c9a227",CELESTE:"#4cc3f2"};
 
 const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
@@ -825,6 +829,7 @@ const msgMoto = d => `Hola Malhuayza Motors, me interesa la ${d.brand} ${d.model
 const fmtNum = n => n.slice(2).replace(/(\d{3})(\d{3})(\d{3})/,"$1 $2 $3");
 /* Hoja para elegir entre los números de "Contacto" */
 function contactSheet(msg,sub){
+  TRACK_CTX=sub||"";
   return `
     <div class="drag-zone" id="dragZone">
       <div class="grabber" aria-hidden="true"></div>
@@ -833,7 +838,7 @@ function contactSheet(msg,sub){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    <div class="wa-list">${SALES.map(n=>`<a class="wa-item" href="${wa(n,msg)}" target="_blank" rel="noopener"><div><b>Contacto</b><span>${fmtNum(n)}</span></div><i>Escribir</i></a>`).join("")}</div>
+    <div class="wa-list">${SALES.map(n=>`<a class="wa-item" href="${wa(n,msg)}" target="_blank" rel="noopener"><div><b>${SALES_LABEL[n]||"Contacto"}</b><span>${fmtNum(n)}</span></div><i>Escribir</i></a>`).join("")}</div>
     <p class="note">Te respondemos de lunes a sábado, de 8:00 a. m. a 7:00 p. m.</p>`;
 }
 const pageBase = () => location.href.split("#")[0];
@@ -1025,6 +1030,7 @@ function buildStores(){
     </button>`).join("");
 }
 function storeSheet(s){
+  TRACK_CTX=s.name;
   return `
     <div class="drag-zone" id="dragZone">
       <div class="grabber" aria-hidden="true"></div>
@@ -1242,6 +1248,20 @@ function route(){
 }
 function goView(v){ if(location.hash!=="#"+v) location.hash=v; else route(); window.scrollTo(0,0); }
 
+/* ================= CONTADOR DE VISITAS ================= */
+function track(name,params){ try{ if(window.gtag) gtag("event",name,params||{}); }catch(e){} }
+if(GA_ID){
+  window.dataLayer=window.dataLayer||[]; window.gtag=function(){dataLayer.push(arguments);};
+  gtag("js",new Date()); gtag("config",GA_ID);
+  const s=document.createElement("script"); s.async=true; s.src="https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(GA_ID); document.head.appendChild(s);
+}
+let TRACK_CTX="";   // modelo o motivo del mensaje que se está por enviar
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a.wa-item,a.primary"); if(!a) return;
+  if(a.classList.contains("primary")) track("como_llegar",{sede:($("mTitle")||{}).textContent||""});
+  else track("consultar_whatsapp",{contacto:(a.querySelector("b")||{}).textContent||"",modelo:a.closest("#contactList")?"Pestaña Contacto":TRACK_CTX});
+});
+
 /* ================= EVENTOS ================= */
 buildCatalogControls(); buildStores(); buildContacts(); buildFin();
 const st=openStatus(); $("openTxt").textContent=st.txt; $("openPill").classList.toggle("closed",!st.open); $("openTxt2").textContent=st.txt;
@@ -1270,13 +1290,13 @@ $("grid").addEventListener("click",e=>{
   if(e.target.closest("[data-clear-all]")){clearAll();S.q="";$("q").value="";renderCatalog();return;}
   const f=e.target.closest("[data-fav]"); if(f){toggleFav(f.dataset.fav);return;}
   const c=e.target.closest("[data-consult]"); if(c){const d=DATA[+c.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),c);return;}
-  const b=e.target.closest("[data-open]"); if(b) openSheet(motoSheet(DATA[+b.dataset.open]),b);
+  const b=e.target.closest("[data-open]"); if(b){ const d=DATA[+b.dataset.open]; track("ver_moto",{modelo:d.brand+" "+d.model,tipo:d.type}); openSheet(motoSheet(d),b); }
 });
 $("stores").addEventListener("click",e=>{const b=e.target.closest("[data-store]");if(b)openSheet(storeSheet(STORES.find(s=>s.id===b.dataset.store)),b);});
 $("scrim").addEventListener("click",()=>closeSheet());
 $("sheet").addEventListener("click",e=>{
   if(e.target.closest("[data-close]")){closeSheet();return;}
-  const cp=e.target.closest("[data-copy]"); if(cp){copyText(cp.dataset.copy);return;}
+  const cp=e.target.closest("[data-copy]"); if(cp){track("copiar_enlace");copyText(cp.dataset.copy);return;}
   const cs=e.target.closest("[data-consult]"); if(cs){const d=DATA[+cs.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),SH.trigger);return;}
   if(e.target.closest("[data-send-favs]")){openSheet(contactSheet(favsMsg(),"Mi selección"),SH.trigger);return;}
   const fv=e.target.closest("[data-fav-sheet]"); if(fv){toggleFav(fv.dataset.favSheet);const on=favs.has(fv.dataset.favSheet);fv.textContent=on?"✓ Me interesa":"♡ Me interesa";fv.setAttribute("aria-pressed",on);return;}
@@ -1286,7 +1306,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
 
 $("trayCmp").addEventListener("click",e=>openSheet(compareSheet(),e.currentTarget));
 $("trayWa").addEventListener("click",e=>openSheet(contactSheet(favsMsg(),"Mi selección"),e.currentTarget));
-$("finWa").addEventListener("click",e=>openSheet(contactSheet(FIN.msg,"Evaluación de financiamiento"),e.currentTarget));
+$("finWa").addEventListener("click",e=>{ track("pedir_evaluacion",{modelo:(BY_KEY[FIN.key]||{}).model||"otro"}); openSheet(contactSheet(FIN.msg,"Evaluación de financiamiento"),e.currentTarget); });
 $("trayX").addEventListener("click",()=>{favs.clear();store.set("mm-favs",[]);document.querySelectorAll("[data-fav]").forEach(b=>b.setAttribute("aria-pressed","false"));renderTray();});
 
 $("finModel").addEventListener("change",e=>{FIN.init=0;setFinVehicle(e.target.value);});
