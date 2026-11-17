@@ -117,6 +117,31 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .type-tile[aria-pressed="true"] .lbl{background:var(--brand)}
 .type-tile[aria-pressed="true"] small{color:rgba(255,255,255,.9)}
 
+/* Destacados: franja oscura con la bandera a cuadros; ofertas y nuevos ingresos en grande */
+.feat{position:relative;background:#16181b;color:#fff;padding:18px 0 16px;overflow:hidden}
+.feat::before{content:"";position:absolute;inset:0;background:conic-gradient(rgba(255,255,255,.045) 25%,transparent 0 50%,rgba(255,255,255,.045) 0 75%,transparent 0) 0 0/28px 28px;pointer-events:none}
+.feat .wrap{position:relative}
+.feat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
+.feat-title{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,7.6vw,44px);line-height:.95;margin:0;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance}
+.feat-title em{font-style:normal;color:#ff4a50}
+.feat-sub{margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.78)}
+.feat-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.feat-row::-webkit-scrollbar{display:none}
+.feat-card{flex:none;width:min(74vw,300px);scroll-snap-align:start;display:flex;flex-direction:column;border:0;padding:0;border-radius:var(--radius);overflow:hidden;background:#24272b;color:#fff;text-align:left;cursor:pointer;box-shadow:0 10px 26px -12px rgba(0,0,0,.6)}
+.feat-card .ph{position:relative;aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;color:#9aa0a8}
+.feat-card .ph svg{width:62%;height:auto;opacity:.5}
+.feat-card .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.feat-card .tag{position:absolute;top:10px;left:10px;z-index:1;font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;padding:5px 10px;border-radius:999px;background:var(--brand);color:#fff}
+.feat-card .tag.new{background:#16181b}
+.feat-card .info{padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px}
+.feat-card b{font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase;overflow-wrap:anywhere}
+.feat-card small{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em}
+.feat-card .pr{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
+.feat-card .pr strong{font-family:var(--font-display);font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.feat-card .pr del{font-size:13px;color:rgba(255,255,255,.62)}
+.feat-card .go{margin-top:10px;font-size:13px;font-weight:700;color:#ff8d91}
+@media (hover:hover){.feat-card:hover .go{text-decoration:underline;text-underline-offset:3px}}
+
 /* Marcas */
 .brands{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
 .brands::-webkit-scrollbar{display:none}
@@ -337,8 +362,8 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 
 /* Respuesta inmediata al tocar */
 button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.wa,.ghost,.primary,.btn-filter,.seg button,.reset,.close,.type-tile,.brand-tile,.fav,.tab,.af,.tray button,.wa-item{transition:transform 100ms ease-out,background-color 150ms ease,color 150ms ease}
-.wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active{transform:scale(.96)}
+.wa,.ghost,.primary,.btn-filter,.seg button,.reset,.close,.type-tile,.brand-tile,.fav,.tab,.af,.tray button,.wa-item,.feat-card{transition:transform 100ms ease-out,background-color 150ms ease,color 150ms ease}
+.wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.feat-card:active{transform:scale(.97)}
 
 @media (max-width:560px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -353,6 +378,9 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
   .btn-filter .lbl-txt{display:none}
   .badge{font-size:10.5px}
   .fin-sum b{font-size:15px}
+  .feat-card .ph{aspect-ratio:16/11}
+  .feat-card b{font-size:22px}
+  .feat-card .pr strong{font-size:30px}
 }
 @media (prefers-reduced-transparency: reduce){
   .bar{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
@@ -364,7 +392,7 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 }
 @media (prefers-reduced-motion: reduce){
   *{scroll-behavior:auto!important;animation:none!important}
-  .wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.card:has(.card-img:active),.store:active{transform:none}
+  .wa:active,.ghost:active,.primary:active,.btn-filter:active,.seg button:active,.reset:active,.close:active,.type-tile:active,.brand-tile:active,.fav:active,.tab:active,.af:active,.tray button:active,.wa-item:active,.feat-card:active,.card:has(.card-img:active),.store:active{transform:none}
   .filters{transform:none!important}
   .toast{transition:opacity 150ms ease}
 }
@@ -388,6 +416,15 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 <main id="main">
 <section class="view" id="v-catalogo" aria-labelledby="t-catalogo">
   <h1 class="sr" id="t-catalogo">Catálogo</h1>
+  <div class="feat" id="feat" hidden>
+    <div class="wrap">
+      <div class="feat-head"><div>
+        <h2 class="feat-title" id="featTitle"></h2>
+        <p class="feat-sub" id="featSub"></p>
+      </div></div>
+      <div class="feat-row" id="featRow"></div>
+    </div>
+  </div>
   <div class="wrap block">
     <div class="block-head"><div><h2 class="section-title">Marcas</h2></div></div>
     <div class="brands" id="brands" role="group" aria-label="Filtrar por marca"></div>
@@ -901,6 +938,21 @@ function buildCatalogControls(){
   $("fPrice").max=maxP;$("fPrice").value=maxP;S.max=maxP;
 }
 
+/* Destacados: primero las unidades con Precio especial, luego los nuevos ingresos (con foto primero) */
+function buildFeatured(){
+  const offers=DATA.filter(d=>d.offer), fresh=DATA.filter(d=>d.isNew&&!d.offer);
+  const byPhoto=(a,b)=>(b.photos.length>0)-(a.photos.length>0);
+  const list=[...offers.sort((a,b)=>byPhoto(a,b)||(a.price-b.price)), ...fresh.sort((a,b)=>byPhoto(a,b)||(b.last-a.last))].slice(0,8);
+  $("feat").hidden=!list.length; if(!list.length) return;
+  $("featTitle").innerHTML = offers.length&&fresh.length ? "Precios especiales <em>y</em> nuevos ingresos" : offers.length ? "Precios <em>especiales</em>" : "Nuevos <em>ingresos</em>";
+  $("featSub").textContent = offers.length ? `${offers.length} modelo${offers.length>1?"s":""} a precio especial por año del modelo${fresh.length?", más lo último que llegó":""}.` : "Lo último que llegó a nuestras tiendas.";
+  $("featRow").innerHTML = list.map(d=>`<button class="feat-card" type="button" data-open="${d.id}">
+    <span class="ph">${icon(d.type)}${d.photos.length?imgTag(d.photos[0],600,d.brand+" "+d.model):""}<span class="tag${d.offer?"":" new"}">${d.offer?"Precio especial":"Nuevo ingreso"}</span></span>
+    <span class="info"><b>${esc(d.model)}</b><small>${d.brand} · ${d.type} · ${d.cc}</small>
+      <span class="pr"><strong>${fmt(d.price)}</strong>${d.offer?`<del>${fmt(d.list)}</del>`:""}</span>
+      <span class="go">Ver ficha y colores →</span></span></button>`).join("");
+}
+
 function filtered(){
   const words=norm(S.q).split(/\s+/).filter(Boolean);
   const list=DATA.filter(d=>{
@@ -1265,7 +1317,7 @@ document.addEventListener("click",e=>{
 });
 
 /* ================= EVENTOS ================= */
-buildCatalogControls(); buildStores(); buildContacts(); buildFin();
+buildCatalogControls(); buildFeatured(); buildStores(); buildContacts(); buildFin();
 const st=openStatus(); $("openTxt").textContent=st.txt; $("openPill").classList.toggle("closed",!st.open); $("openTxt2").textContent=st.txt;
 
 $("q").addEventListener("input",e=>{S.q=e.target.value;renderCatalog();});
@@ -1294,6 +1346,7 @@ $("grid").addEventListener("click",e=>{
   const c=e.target.closest("[data-consult]"); if(c){const d=DATA[+c.dataset.consult];openSheet(contactSheet(msgMoto(d),d.brand+" "+d.model),c);return;}
   const b=e.target.closest("[data-open]"); if(b){ const d=DATA[+b.dataset.open]; track("ver_moto",{modelo:d.brand+" "+d.model,tipo:d.type}); openSheet(motoSheet(d),b); }
 });
+$("featRow").addEventListener("click",e=>{ const b=e.target.closest("[data-open]"); if(!b) return; const d=DATA[+b.dataset.open]; track("ver_moto",{modelo:d.brand+" "+d.model,tipo:d.type,origen:"Destacados"}); openSheet(motoSheet(d),b); });
 $("stores").addEventListener("click",e=>{const b=e.target.closest("[data-store]");if(b)openSheet(storeSheet(STORES.find(s=>s.id===b.dataset.store)),b);});
 $("scrim").addEventListener("click",()=>closeSheet());
 $("sheet").addEventListener("click",e=>{
@@ -1333,7 +1386,7 @@ renderCatalog(); renderFin(); renderTray(); route(); onScroll();
 function rebuildControls(){
   ["types","fTypes","brands","fBrands"].forEach(id=>$(id).innerHTML="");
   const keepMax = S.max<+$("fPrice").max ? S.max : null;
-  buildCatalogControls(); buildFin();
+  buildCatalogControls(); buildFeatured(); buildFin();
   if(keepMax) { S.max=keepMax; $("fPrice").value=keepMax; }
   favs = new Set([...favs].filter(k=>BY_KEY[k]));
   if(FIN.key&&FIN.key!=="otro") setFinVehicle(FIN.key);
