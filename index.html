@@ -119,7 +119,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 /* Marcas */
 .brands{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
 .brands::-webkit-scrollbar{display:none}
-.brand-tile{flex:none;scroll-snap-align:start;width:132px;height:84px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:var(--shadow);background-size:70% auto;background-position:center 40%;background-repeat:no-repeat}
+.brand-tile{flex:none;scroll-snap-align:start;width:132px;height:84px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:var(--shadow)}
 .brand-tile b{font-family:var(--font-display);font-size:24px;letter-spacing:.02em;line-height:1}
 .brand-tile small{font-size:11px;color:var(--muted);font-weight:600}
 .brand-tile.has-logo b{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -209,6 +209,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .price em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
 .price-row{margin-top:auto;padding-top:6px}
 .actions{display:flex;gap:8px}
+.actions .wa{flex:1}
 .wa{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;font-size:14px;border-radius:999px;padding:9px 13px;white-space:nowrap;border:0;cursor:pointer}
 .ghost{min-height:44px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 12px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .primary{min-height:44px;border:0;background:var(--brand);color:var(--brand-ink);border-radius:999px;padding:11px 14px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
@@ -223,7 +224,7 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .tray.on{display:flex;animation:trayIn 260ms cubic-bezier(.2,.9,.3,1.2)}
 @keyframes trayIn{from{transform:translate(-50%,16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .tray span{font-size:14px;font-weight:600;white-space:nowrap}
-.tray button,.tray a{text-decoration:none;border:0;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.tray button{text-decoration:none;border:0;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .tray .t-wa{background:var(--wa);color:#fff}
 .tray .t-cmp{background:var(--bg);color:var(--ink)}
 .tray .t-x{background:transparent;color:var(--bg);opacity:.75;padding:8px}
@@ -276,7 +277,6 @@ input,select{caret-color:var(--brand);accent-color:var(--brand)}
 .plan dt{color:var(--muted)}
 .plan dd{margin:0;font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
 .note{font-size:13px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0}
-.warn{color:var(--wait);font-weight:600;font-size:13px}
 
 /* Contacto y preguntas */
 .faq{display:flex;flex-direction:column;gap:8px;padding-bottom:24px}
@@ -575,14 +575,10 @@ button,a,.store,select{touch-action:manipulation;-webkit-tap-highlight-color:tra
 /* ================= CONFIGURACIÓN ================= */
 /* Números que aparecen al tocar "Consultar" (código de país + número, sin espacios). Se muestran solo como "Contacto". */
 const SALES = ["51989005413","51941052030"];
-const WHATSAPP = SALES[0];
 
 /* Enlace CSV de la pestaña "Web" publicada (Archivo → Compartir → Publicar en la Web).
    Si está vacío o falla, la página usa la última copia guardada o los datos de respaldo de abajo. */
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9CpWcPpaDjFhx02fPZ6XUo5EK4oh77hbo7fav8LDv3n1OAZPGr5ruVBXbLXGhcOBulwP_qwHR6228/pub?gid=100&single=true&output=csv";
-
-/* Logos de marca: cuando subas los archivos a la carpeta img/marcas/ escribe aquí la ruta, ej. JCH:"img/marcas/jch.png" */
-const BRAND_LOGO = {};
 
 /* Fórmula aproximada de Global Go, ajustada con 5 simulaciones reales (error máximo ±S/1.50).
    cuota semanal = a + b × monto financiado + c × precio del vehículo */
@@ -707,7 +703,6 @@ const RAW = [
 /* ================= DATOS DERIVADOS ================= */
 const TYPE_ORDER = ["Scooter","Pistera","Urbana","Todoterreno","Utilitaria","Semiautomática","Custom","Aventura","Eléctrica","Trimoto pasajero","Trimoto carga","Cuatrimoto","Cuatricarga"];
 const TYPE_LABEL = {"Scooter":"Scooters","Pistera":"Pisteras","Urbana":"Urbanas","Todoterreno":"Todoterreno","Utilitaria":"Utilitarias","Semiautomática":"Semiautomáticas","Custom":"Custom","Aventura":"Aventura","Eléctrica":"Eléctricas","Trimoto pasajero":"Trimotos pasajero","Trimoto carga":"Trimotos carga","Cuatrimoto":"Cuatrimotos","Cuatricarga":"Cuatricargas"};
-const TYPE_COLOR = {"Scooter":"#2c5ec9","Pistera":"#c4161c","Urbana":"#3b3f46","Todoterreno":"#7a5a1e","Utilitaria":"#2b7a4b","Semiautomática":"#6a3fb0","Custom":"#5a2a1a","Aventura":"#1d6b74","Eléctrica":"#0f8f7a","Trimoto pasajero":"#b4521a","Trimoto carga":"#8a1d22","Cuatrimoto":"#1f2a44","Cuatricarga":"#4a4f1a"};
 const COLOR_HEX = {NEGRO:"#17181a",BLANCO:"#f7f7f5",ROJO:"#d32027",AZUL:"#1f4fd6",GRIS:"#8b9098",PLATA:"#c4c8ce",VERDE:"#2f9e52",AMARILLO:"#f3c300",ANARANJADO:"#f27a12",NARANJA:"#f27a12",MORADO:"#7b3fb2",ROSADO:"#f39ac0",DORADO:"#c9a227",CELESTE:"#4cc3f2"};
 
 const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
@@ -742,7 +737,7 @@ let LOGOS = {}, LOCALS = {};   // IDs de Drive: logo por marca y fotos por sede 
 function setData(list){
   DATA = list.filter(o=>o.brand&&o.model&&o.price>0).map(makeItem);
   BY_KEY = Object.fromEntries(DATA.map(d=>[d.key,d]));
-  DATA.forEach(d=>{ if(!TYPE_LABEL[d.type]){ TYPE_LABEL[d.type]=d.type; TYPE_COLOR[d.type]="#3b3f46"; TYPE_ORDER.push(d.type); } });
+  DATA.forEach(d=>{ if(!TYPE_LABEL[d.type]){ TYPE_LABEL[d.type]=d.type; TYPE_ORDER.push(d.type); } });
 }
 
 /* Lector de CSV (respeta comillas y saltos de línea dentro de celdas) */
@@ -869,9 +864,10 @@ function buildCatalogControls(){
   const bc={};DATA.forEach(d=>bc[d.brand]=(bc[d.brand]||0)+1);
   const brands=Object.keys(bc).sort((a,b)=>bc[b]-bc[a]||a.localeCompare(b));
   $("brands").innerHTML = brands.map(b=>{
-    const logo=BRAND_LOGO[b], lid=LOGOS[b];
-    const img=lid&&!logo?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
-    return `<button class="brand-tile${logo||lid?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}"${logo?` style="background-image:url('${logo}')"`:""}>${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
+    /* Logo de la marca desde la carpeta LOGOS de Drive; si falla, se muestra el nombre */
+    const lid=LOGOS[b];
+    const img=lid?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
+    return `<button class="brand-tile${lid?" has-logo":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}">${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
   }).join("");
   $("fBrands").innerHTML = brands.slice().sort().map(b=>`<button class="pill" type="button" data-v="${b}" aria-pressed="false">${b}<small>${bc[b]}</small></button>`).join("");
   const maxP=Math.ceil(Math.max(...DATA.map(d=>d.price))/500)*500;
