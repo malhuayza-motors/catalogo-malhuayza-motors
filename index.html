@@ -756,6 +756,9 @@ const BRAND_COLORS = {
   ADVANCE:"#ffffff", QINGQI:"#ffffff", SHENGLI:"#ffffff"
 };
 
+/* Marcas que van siempre primero en "Marcas", en este orden; las demás siguen por cantidad de modelos */
+const BRAND_FIRST = ["JCH","QINGQI"];
+
 /* Contador de visitas (Google Analytics 4). Pega aquí el ID de medición "G-XXXXXXXXXX"; vacío = desactivado */
 const GA_ID = "G-M87ZML5VDM";
 
@@ -1068,7 +1071,8 @@ function buildCatalogControls(){
   }).join("");
   $("fTypes").innerHTML = types.map(t=>`<button class="pill" type="button" data-v="${t}" aria-pressed="false">${TYPE_LABEL[t]}<small>${counts[t]}</small></button>`).join("");
   const bc={};DATA.forEach(d=>bc[d.brand]=(bc[d.brand]||0)+1);
-  const brands=Object.keys(bc).sort((a,b)=>bc[b]-bc[a]||a.localeCompare(b));
+  const pin=b=>{const i=BRAND_FIRST.indexOf(b);return i<0?99:i;};
+  const brands=Object.keys(bc).sort((a,b)=>pin(a)-pin(b)||bc[b]-bc[a]||a.localeCompare(b));
   $("brands").innerHTML = brands.map(b=>{
     /* Logo de la marca desde la carpeta LOGOS de Drive; si falla, se muestra el nombre */
     const lid=LOGOS[b];
