@@ -747,14 +747,16 @@ const SALES_LABEL = {"51989005413":"Contacto · Américo Oré","51941052030":"Co
    Si está vacío o falla, la página usa la última copia guardada o los datos de respaldo de abajo. */
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9CpWcPpaDjFhx02fPZ6XUo5EK4oh77hbo7fav8LDv3n1OAZPGr5ruVBXbLXGhcOBulwP_qwHR6228/pub?gid=100&single=true&output=csv";
 
-/* Color de fondo de cada logo de marca (el cuadro de la marca se rellena con él).
-   "fondo|texto": el texto de la cantidad de modelos va en blanco u oscuro según el fondo, salvo que se indique.
-   Una marca nueva sin color aquí (ni en la columna "Color logo" del Sheet) queda en blanco. */
+/* Color de cada cuadro de marca: se toma AUTOMÁTICAMENTE del borde de su logo al cargarlo.
+   BRAND_COLORS solo se usa mientras carga el logo la primera vez (o si no se pudiera leer).
+   BRAND_TEXT fija el color del texto de una marca; si no está, va en blanco u oscuro según el fondo.
+   Para forzar un color, escribe en la columna "Color logo" del Sheet: "#0084c5" o "#ffa938|#ffffff" (fondo|texto). */
 const BRAND_COLORS = {
-  JCH:"#ffa938|#ffffff",   // naranja; texto en blanco (pedido)
-  ARTSUN:"#f80205", SENKE:"#0084c5", STRONG:"#08478a",
+  JCH:"#ffa938", ARTSUN:"#f80205", SENKE:"#0084c5", STRONG:"#08478a",
   ADVANCE:"#ffffff", QINGQI:"#ffffff", SHENGLI:"#ffffff"
 };
+const BRAND_TEXT = { JCH:"#ffffff" };   // JCH: texto blanco (pedido)
+const BRAND_FIXED = {};                 // colores escritos en la columna "Color logo" del Sheet
 
 /* Marcas que van siempre primero en "Marcas", en este orden; las demás siguen por cantidad de modelos */
 const BRAND_FIRST = ["JCH","QINGQI"];
@@ -883,7 +885,7 @@ const RAW = [
 ];
 
 /* ================= DATOS DERIVADOS ================= */
-const TYPE_ORDER = ["Scooter","Pistera","Urbana","Todoterreno","Utilitaria","Semiautomática","Custom","Aventura","Eléctrica","Trimoto pasajero","Trimoto carga","Cuatrimoto","Cuatricarga"];
+const TYPE_ORDER = ["Eléctrica","Semiautomática","Scooter","Trimoto pasajero","Pistera","Urbana","Todoterreno","Utilitaria","Custom","Aventura","Trimoto carga","Cuatrimoto","Cuatricarga"];
 const TYPE_LABEL = {"Scooter":"Scooters","Pistera":"Pisteras (deportivas)","Urbana":"Urbanas","Todoterreno":"Todoterreno","Utilitaria":"Utilitarias","Semiautomática":"Semiautomáticas","Custom":"Custom","Aventura":"Aventura","Eléctrica":"Eléctricas","Trimoto pasajero":"Trimotos pasajero","Trimoto carga":"Trimotos carga","Cuatrimoto":"Cuatrimotos","Cuatricarga":"Cuatricargas"};
 const COLOR_HEX = {NEGRO:"#17181a",BLANCO:"#f7f7f5",ROJO:"#d32027",AZUL:"#1f4fd6",GRIS:"#8b9098",PLATA:"#c4c8ce",VERDE:"#2f9e52",AMARILLO:"#f3c300",ANARANJADO:"#f27a12",NARANJA:"#f27a12",MORADO:"#7b3fb2",ROSADO:"#f39ac0",DORADO:"#c9a227",CELESTE:"#4cc3f2"};
 
@@ -968,7 +970,7 @@ function fromSheet(text){
   rows.slice(1).forEach(r=>{
     const b=(r[ix.brand]||"").trim().toUpperCase(), lg=iLogo>=0?(r[iLogo]||"").trim().split(/\s+/)[0]:"";
     if(b&&lg) logos[b]=lg;
-    const lc=iColor>=0?(r[iColor]||"").trim():""; if(b&&/^#[0-9a-f]{3,6}(\|#[0-9a-f]{3,6})?$/i.test(lc)) BRAND_COLORS[b]=lc;
+    const lc=iColor>=0?(r[iColor]||"").trim():""; if(b&&/^#[0-9a-f]{3,6}(\|#[0-9a-f]{3,6})?$/i.test(lc)) BRAND_FIXED[b]=lc;
     const ln=iLocal>=0?(r[iLocal]||"").trim():"", li=iLocalImg>=0?(r[iLocalImg]||"").trim():"";
     if(ln&&li) locals[slug(ln)]=li.split(/[\s,]+/).filter(Boolean);
   });
@@ -1004,9 +1006,42 @@ function icon(type){
   if(type==="Scooter"||type==="Eléctrica"||type==="Semiautomática") return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(45,82,20)}${wheel(158,82,20)}<path d="M45 82 H120 L135 50 H75 L70 65 M135 50 L150 22 H165 M158 82 L142 40" ${st}/></svg>`;
   return `<svg viewBox="0 0 200 110" aria-hidden="true">${wheel(42,80,24)}${wheel(160,80,24)}<path d="M42 80 L75 45 H120 L135 30 H150 M75 45 L95 80 H125 L145 45 L160 80 M88 45 L95 32 H125" ${st}/></svg>`;
 }
-/* Fotos desde Drive (carpeta FOTOS WEB): miniatura del tamaño justo; si falla, prueba el otro servidor de Google */
-const imgSrc = (id,w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
-const imgTag = (id,w,alt,lazy=true) => `<img src="${imgSrc(id,w)}" alt="${esc(alt)}"${lazy?' loading="lazy"':""} decoding="async" data-ld onload="this.classList.add('ok')" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}'}else{this.remove()}">`;
+/* Fotos desde Drive (carpeta FOTOS WEB): miniatura del tamaño justo desde el servidor de imágenes de Google;
+   si falla, prueba la miniatura de Drive. Los PNG con fondo transparente llegan con fondo negro: imgOk() lo vuelve blanco. */
+const imgSrc = (id,w) => `https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=w${w}`;
+const imgAlt = (id,w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+const IMG_ATTRS = (id,w,gone) => `crossorigin="anonymous" decoding="async" data-ld onload="imgOk(this)" onerror="if(!this.dataset.r){this.dataset.r=1;this.removeAttribute('crossorigin');this.src='${imgAlt(id,w)}'}else{${gone}}"`;
+const imgTag = (id,w,alt,lazy=true) => `<img src="${imgSrc(id,w)}" alt="${esc(alt)}"${lazy?' loading="lazy"':""} ${IMG_ATTRS(id,w,"this.remove()")}>`;
+
+/* Fondo negro de PNG transparentes -> blanco. Solo si las 4 esquinas son negras puras:
+   se pinta de blanco el negro conectado con el borde y se suaviza el contorno. */
+function imgOk(img){
+  img.classList.add("ok");
+  if(img.dataset.fx) return;
+  img.dataset.fx="1";
+  let fixed=false;
+  try{
+    const w=img.naturalWidth, h=img.naturalHeight; if(!w||!h) return;
+    const c=document.createElement("canvas"); c.width=w; c.height=h;
+    const x=c.getContext("2d",{willReadFrequently:true}); x.drawImage(img,0,0);
+    const d=x.getImageData(0,0,w,h), p=d.data, thr=24;
+    const dark=i=>p[i*4+3]>200&&p[i*4]+p[i*4+1]+p[i*4+2]<=thr;
+    if([0,w-1,(h-1)*w,h*w-1].every(dark)){
+      const seen=new Uint8Array(w*h), st=[];
+      for(let i=0;i<w;i++) st.push(i,(h-1)*w+i);
+      for(let j=0;j<h;j++) st.push(j*w,j*w+w-1);
+      while(st.length){ const i=st.pop(); if(seen[i]) continue; seen[i]=1; if(!dark(i)) continue;
+        p[i*4]=p[i*4+1]=p[i*4+2]=255; seen[i]=2;
+        const xx=i%w; if(xx>0) st.push(i-1); if(xx<w-1) st.push(i+1); if(i>=w) st.push(i-w); if(i<w*(h-1)) st.push(i+w); }
+      for(let i=0;i<w*h;i++){ if(seen[i]===2) continue;
+        if((i%w>0&&seen[i-1]===2)||(i%w<w-1&&seen[i+1]===2)||(i>=w&&seen[i-w]===2)||(i<w*(h-1)&&seen[i+w]===2)){
+          const a=Math.max(p[i*4],p[i*4+1],p[i*4+2])/255; if(a<.6) for(let k=0;k<3;k++) p[i*4+k]=Math.round(p[i*4+k]+255*(1-a)); } }
+      x.putImageData(d,0,0); fixed=true;
+      c.toBlob(b=>{ if(b){ img.src=URL.createObjectURL(b); } },"image/webp",.92);
+    }
+    if(img.classList.contains("logo")) brandFromLogo(img,x,w,h);
+  }catch(e){ /* imagen sin permiso de lectura (miniatura de Drive): se deja como está */ }
+}
 const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>`;
 const wa = (num,msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
 const msgMoto = d => `Hola Malhuayza Motors, me interesa la ${d.brand} ${d.model} (${fmt(d.price)}). ¿Me pueden dar más información?`;
@@ -1066,7 +1101,7 @@ function buildCatalogControls(){
   const types=TYPE_ORDER.filter(t=>counts[t]);
   $("types").innerHTML = types.map(t=>{
     const withPh=DATA.filter(d=>d.type===t&&d.photos.length).sort((a,b)=>(b.stock>0)-(a.stock>0));
-    const ph=withPh.length?`<img src="${imgSrc(withPh[0].photos[0],400)}" alt="" loading="lazy" decoding="async" data-ld onload="this.classList.add('ok')" onerror="this.remove()">`:"";
+    const ph=withPh.length?`<img src="${imgSrc(withPh[0].photos[0],400)}" alt="" loading="lazy" ${IMG_ATTRS(withPh[0].photos[0],400,"this.remove()")}>`:"";
     return `<button class="type-tile" type="button" data-t="${t}" aria-pressed="false"><span class="ph">${icon(t)}${ph}</span><span class="lbl"><b>${TYPE_LABEL[t]}</b><small>${counts[t]} modelo${counts[t]>1?"s":""}</small></span></button>`;
   }).join("");
   $("fTypes").innerHTML = types.map(t=>`<button class="pill" type="button" data-v="${t}" aria-pressed="false">${TYPE_LABEL[t]}<small>${counts[t]}</small></button>`).join("");
@@ -1076,8 +1111,8 @@ function buildCatalogControls(){
   $("brands").innerHTML = brands.map(b=>{
     /* Logo de la marca desde la carpeta LOGOS de Drive; si falla, se muestra el nombre */
     const lid=LOGOS[b];
-    const img=lid?`<img class="logo" src="${imgSrc(lid,300)}" alt="" decoding="async" data-ld onload="this.classList.add('ok')" onerror="this.parentNode.classList.remove('has-logo');this.remove()">`:"";
-    const bcol=lid?brandColor(b):null;
+    const img=lid?`<img class="logo" data-lid="${esc(lid)}" src="${imgSrc(lid,300)}" alt="" ${IMG_ATTRS(lid,300,"this.parentNode.classList.remove('has-logo','branded');this.remove()")}>`:"";
+    const bcol=lid?brandColor(b,lid):null;
     const st=bcol?` style="--bc:${bcol.bg};--bf:${bcol.fg}"`:"";
     return `<button class="brand-tile${lid?" has-logo branded":""}${bcol&&bcol.light?" light-txt":""}" type="button" data-b="${b}" aria-pressed="false" aria-label="${b}"${st}>${img}<b>${b}</b><small>${bc[b]} modelo${bc[b]>1?"s":""}</small></button>`;
   }).join("");
@@ -1087,12 +1122,31 @@ function buildCatalogControls(){
 }
 
 /* Color del cuadro de una marca: fondo del logo y texto que se lea bien sobre él */
-function brandColor(b){
-  const [bg,fg0]=String(BRAND_COLORS[b]||"#ffffff").split("|");
+let BRAND_AUTO = store.get("mm-bc",{});   // color detectado por logo (id de Drive -> #rrggbb)
+function brandColor(b,lid){
+  const fixed=BRAND_FIXED[b]?String(BRAND_FIXED[b]).split("|"):null;
+  const bg=(fixed&&fixed[0])||BRAND_AUTO[lid]||BRAND_COLORS[b]||"#ffffff";
   const h=bg.replace("#",""), x=h.length===3?h.split("").map(c=>c+c).join(""):h;
   const [r,g,bl]=[0,2,4].map(i=>parseInt(x.slice(i,i+2),16)||0);
-  const fg=fg0||((0.299*r+0.587*g+0.114*bl)<150?"#ffffff":"#16181b");
+  const fg=(fixed&&fixed[1])||BRAND_TEXT[b]||((0.299*r+0.587*g+0.114*bl)<150?"#ffffff":"#16181b");
   return {bg, fg, light:/^#f{3}(f{3})?$/i.test(fg)};
+}
+/* Lee el borde del logo y usa su color más frecuente como fondo del cuadro (transparente cuenta como blanco) */
+function brandFromLogo(img,x,w,h){
+  const tile=img.closest(".brand-tile"); if(!tile) return;
+  const b=tile.dataset.b; if(BRAND_FIXED[b]) return;
+  const lid=img.dataset.lid; if(!lid) return;
+  const d=x.getImageData(0,0,w,h).data, cnt=new Map();
+  const add=i=>{ let r=d[i*4],g=d[i*4+1],bl=d[i*4+2]; if(d[i*4+3]<128){r=g=bl=255;}
+    const k=(r>>4)<<8|(g>>4)<<4|(bl>>4); const e=cnt.get(k)||[0,0,0,0]; e[0]++;e[1]+=r;e[2]+=g;e[3]+=bl; cnt.set(k,e); };
+  const step=Math.max(1,Math.round(Math.max(w,h)/200));
+  for(let i=0;i<w;i+=step){ add(i); add(w+i); add((h-1)*w+i); add((h-2)*w+i); }
+  for(let j=0;j<h;j+=step){ add(j*w); add(j*w+1); add(j*w+w-1); add(j*w+w-2); }
+  let best=null; cnt.forEach(e=>{ if(!best||e[0]>best[0]) best=e; }); if(!best) return;
+  const hex="#"+[1,2,3].map(k=>Math.round(best[k]/best[0]).toString(16).padStart(2,"0")).join("");
+  if(BRAND_AUTO[lid]!==hex){ BRAND_AUTO[lid]=hex; store.set("mm-bc",BRAND_AUTO); }
+  const col=brandColor(b,lid);
+  tile.style.setProperty("--bc",col.bg); tile.style.setProperty("--bf",col.fg); tile.classList.toggle("light-txt",col.light);
 }
 
 /* Destacados: primero las unidades con Precio especial, luego los nuevos ingresos (con foto primero) */
