@@ -269,6 +269,19 @@ img[data-ld].ok{animation:imgIn 280ms ease-out}
 .gal-zoom{position:absolute;top:8px;left:8px;display:inline-flex;align-items:center;gap:5px;min-height:32px;border:0;border-radius:999px;padding:5px 10px 5px 8px;font-size:12px;font-weight:700;cursor:pointer;background:rgba(22,24,27,.72);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background-color 150ms ease,transform 120ms ease-out}
 .gal-zoom:hover{background:var(--brand)}
 .gal-zoom:active{transform:scale(.95)}
+/* Videos (Drive) dentro de la galería: portada con botón de reproducir; al tocar se carga el reproductor de Drive */
+.gallery .vid{flex:0 0 100%;width:100%;min-width:100%;position:relative;aspect-ratio:4/3;background:#000;border-radius:14px;overflow:hidden;scroll-snap-align:center;cursor:pointer}
+.gallery .vid img{position:absolute;inset:0;width:100%;height:100%;min-width:0;aspect-ratio:auto;object-fit:contain;background:#000;border-radius:0}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.vid-play{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(22,24,27,.72);color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:transform 120ms ease-out,background-color 150ms ease}
+.vid-play svg{width:34px;height:34px;margin-left:4px}
+@media (hover:hover){.vid:hover .vid-play{background:var(--brand)}}
+.vid-play:active{transform:scale(.92)}
+.vid-tag{position:absolute;left:10px;bottom:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 9px;border-radius:999px;background:var(--brand);color:#fff;pointer-events:none}
+.vid.playing img,.vid.playing .vid-play,.vid.playing .vid-tag{display:none}
+.lb .gallery .vid{height:100%;aspect-ratio:auto;border-radius:0}
+.badge.vid{background:#16181b;color:#fff}
+.gallery .vid img,.lb .gallery .vid img{cursor:pointer}
 .lb{position:fixed;inset:0;z-index:90;background:#fff;animation:lbIn 200ms ease-out}
 @keyframes lbIn{from{opacity:0}to{opacity:1}}
 .lb .gal,.lb .gallery{height:100%;border-radius:0}
@@ -974,10 +987,13 @@ function makeItem(o,i){
   const ld=parseDate(o.last);
   const colors=cleanColors(o.colors);
   const nt=readNote(o.note,o.price);
-  const all=(o.photos||[]).map(String), toks=all.filter(t=>!/^RC?:/.test(t)), phIds=toks.map(t=>t.split("~")[0]), phCols=toks.map(t=>photoColor((t.split("~")[1]||"").replace(/\+/g," "),colors));
+  const all=(o.photos||[]).map(String), toks=all.filter(t=>!/^RC?:/.test(t)),
+    kinds=toks.map(t=>/^V:/.test(t)?"vid":/^G:/.test(t)?"gif":"img"), bare=toks.map(t=>t.replace(/^[VG]:/,"")),
+    phIds=bare.map(t=>t.split("~")[0]), phCols=bare.map((t,i)=>kinds[i]==="vid"?"":photoColor((t.split("~")[1]||"").replace(/\+/g," "),colors));
   const spin=all.filter(t=>/^R:/.test(t)).map(t=>t.slice(2)), spinColor=(all.find(t=>/^RC:/.test(t))||"").slice(3).replace(/\+/g," ");
   return {id:i,brand:o.brand,model:o.model,type:o.type,cc:o.cc,ccNum:parseInt(o.cc,10)||0,electric:/w$/i.test(o.cc),
     colors,stock:o.stock,price:nt.offer||o.price,list:o.price,offer:!!nt.offer,note:nt.note,last:ld,sedes:o.sedes||"",photos:phIds.length?phIds:spin.slice(0,1),photoColors:phIds.length?phCols:spin.slice(0,1).map(()=>""),spin,spinColor,
+    kinds:phIds.length?kinds:spin.slice(0,1).map(()=>"img"), cover:phIds.length?(phIds[kinds.indexOf("img")]||phIds[kinds.indexOf("gif")]||phIds[0]):(spin[0]||""), hasVideo:kinds.includes("vid"),
     isNew: !!ld && o.stock>0 && (TODAY-ld)/864e5<=NEW_DAYS,
     isLast: o.stock===1,
     key: slug(o.brand+" "+o.model),
@@ -1158,7 +1174,7 @@ function buildCatalogControls(){
   const types=TYPE_ORDER.filter(t=>counts[t]);
   $("types").innerHTML = types.map(t=>{
     const withPh=DATA.filter(d=>d.type===t&&d.photos.length).sort((a,b)=>(b.stock>0)-(a.stock>0));
-    const ph=withPh.length?`<img src="${imgSrc(withPh[0].photos[0],400)}" alt="" loading="lazy" ${IMG_ATTRS(withPh[0].photos[0],400,"this.remove()")}>`:"";
+    const ph=withPh.length?`<img src="${imgSrc(withPh[0].cover,400)}" alt="" loading="lazy" ${IMG_ATTRS(withPh[0].cover,400,"this.remove()")}>`:"";
     return `<button class="type-tile" type="button" data-t="${t}" aria-pressed="false"><span class="ph">${icon(t)}${ph}</span><span class="lbl"><b>${TYPE_LABEL[t]}</b><small>${counts[t]} modelo${counts[t]>1?"s":""}</small></span></button>`;
   }).join("");
   $("fTypes").innerHTML = types.map(t=>`<button class="pill" type="button" data-v="${t}" aria-pressed="false">${TYPE_LABEL[t]}<small>${counts[t]}</small></button>`).join("");
@@ -1215,7 +1231,7 @@ function buildFeatured(){
   $("featTitle").innerHTML = offers.length&&fresh.length ? "Precios especiales <em>y</em> nuevos ingresos" : offers.length ? "Precios <em>especiales</em>" : "Nuevos <em>ingresos</em>";
   $("featSub").textContent = offers.length ? `${offers.length} modelo${offers.length>1?"s":""} a precio especial por año del modelo${fresh.length?", más lo último que llegó":""}.` : "Lo último que llegó a nuestras tiendas.";
   $("featRow").innerHTML = list.map(d=>`<button class="feat-card" type="button" data-open="${d.id}">
-    <span class="ph">${icon(d.type)}${d.photos.length?imgTag(d.photos[0],600,d.brand+" "+d.model):""}<span class="tag${d.offer?"":" new"}">${d.offer?"Precio especial":"Nuevo ingreso"}</span></span>
+    <span class="ph">${icon(d.type)}${d.photos.length?imgTag(d.cover,600,d.brand+" "+d.model):""}<span class="tag${d.offer?"":" new"}">${d.offer?"Precio especial":"Nuevo ingreso"}</span></span>
     <span class="info"><b>${esc(d.model)}</b><small>${d.brand} · ${d.type} · ${d.cc}</small>
       <span class="pr"><strong>${fmtP(d.price)}</strong>${d.offer?`<del>${fmt(d.list)}</del>`:""}</span>
       <span class="go">Ver ficha y colores →</span></span></button>`).join("");
@@ -1250,14 +1266,15 @@ function badgesHtml(d){
   return (d.offer?`<span class="badge deal">Precio especial</span>`:"")+`<span class="badge ${d.stock?"stock":"order"}">${d.stock?"En tienda":"A pedido"}</span>`+
     (d.isNew?`<span class="badge new">Nuevo ingreso</span>`:"")+
     (d.isLast?`<span class="badge last">Última unidad</span>`:"")+
-    (d.spin.length?`<span class="badge spin">360°</span>`:"");
+    (d.spin.length?`<span class="badge spin">360°</span>`:"")+
+    (d.hasVideo?`<span class="badge vid">▶ Video</span>`:"");
 }
 function card(d){
   const sw=d.colors.slice(0,6).map(swatch).join("");
   const more=d.colors.length>6?`<span class="more">+${d.colors.length-6}</span>`:"";
   return `<article class="card">
     <button class="card-img" type="button" data-open="${d.id}" aria-label="Ver detalle de ${esc(d.brand+" "+d.model)}">
-      ${icon(d.type)}${d.photos.length?imgTag(d.photos[0],600,d.brand+" "+d.model):""}<span class="badges">${badgesHtml(d)}</span>
+      ${icon(d.type)}${d.photos.length?imgTag(d.cover,600,d.brand+" "+d.model):""}<span class="badges">${badgesHtml(d)}</span>
     </button>
     <button class="fav" type="button" data-fav="${d.key}" aria-pressed="${favs.has(d.key)}" aria-label="Me interesa: ${esc(d.model)}">${heart}</button>
     <div class="card-body">
@@ -1328,10 +1345,23 @@ function firstPhotoOf(d,c){ const exact=d.photoColors.findIndex(p=>colorKey(p)==
 /* Flechas para pasar las fotos (útiles en computadora) y puntos que indican cuál foto se ve */
 const ARROW = d => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d<0?"m15 5-7 7 7 7":"m9 5 7 7-7 7"}"/></svg>`;
 const ZOOM = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`;
-function galleryHtml(ids,alt,cover,full,colors){
-  const n=ids.length; colors=colors||[];
-  return `<div class="gal${cover?" cover":""}${full?" lb-gal":""}" data-ids="${esc(ids.join(" "))}" data-alt="${esc(alt)}" data-colors="${esc(colors.map(c=>c.replace(/ /g,"+")).join(" "))}">
-    <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>imgTag(p,full?1600:1200,`${alt} – foto ${i+1}`,i>0)).join("")}</div>
+/* GIF: se pide el archivo original (=s0) para que se mueva; sin el arreglo de fondo, que lo dejaría quieto */
+const gifTag = (id,alt,lazy=true) => `<img data-id="${esc(id)}" data-kind="gif" data-fx="1" data-hi="1" src="https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=s0" alt="${esc(alt)}"${lazy?' loading="lazy"':""} ${IMG_ATTRS(id,1200,"this.remove()")}>`;
+const PLAY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>`;
+const mediaTag = (id,kind,w,alt,lazy) => kind==="vid"
+  ? `<div class="vid" data-vid="${esc(id)}">${imgTag(id,w,alt,lazy)}<button class="vid-play" type="button" data-play aria-label="Reproducir video">${PLAY}</button><span class="vid-tag">Video</span></div>`
+  : kind==="gif" ? gifTag(id,alt,lazy) : imgTag(id,w,alt,lazy);
+function playVideo(v){
+  if(!v||v.classList.contains("playing")) return;
+  v.classList.add("playing");
+  v.insertAdjacentHTML("beforeend",`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(v.dataset.vid)}/preview" allow="autoplay; fullscreen; encrypted-media" allowfullscreen title="Video"></iframe>`);
+  const g=v.closest(".gal"); track("ver_video",{modelo:g?g.dataset.alt:""});
+}
+function stopVideos(root,except){ if(!root) return; root.querySelectorAll(".vid.playing").forEach(v=>{ if(v===except) return; v.classList.remove("playing"); const f=v.querySelector("iframe"); if(f) f.remove(); }); }
+function galleryHtml(ids,alt,cover,full,colors,kinds){
+  const n=ids.length; colors=colors||[]; kinds=kinds||[];
+  return `<div class="gal${cover?" cover":""}${full?" lb-gal":""}" data-ids="${esc(ids.join(" "))}" data-alt="${esc(alt)}" data-colors="${esc(colors.map(c=>c.replace(/ /g,"+")).join(" "))}" data-kinds="${esc(kinds.join(" "))}">
+    <div class="gallery${cover?" cover":""}" aria-label="Fotos de ${esc(alt)}" tabindex="0">${ids.map((p,i)=>mediaTag(p,kinds[i]||"img",full?1600:1200,`${alt} – ${kinds[i]==="vid"?"video":"foto"} ${i+1}`,i>0)).join("")}</div>
     ${full?"":`<button class="gal-zoom" type="button" data-zoom aria-label="Ver fotos en pantalla completa">${ZOOM}<span>Ampliar</span></button>`}
     ${n>1?`<button class="gal-btn prev" type="button" data-gal="-1" aria-label="Foto anterior" hidden>${ARROW(-1)}</button>
     <button class="gal-btn next" type="button" data-gal="1" aria-label="Foto siguiente">${ARROW(1)}</button>
@@ -1348,7 +1378,7 @@ function bindGalleries(root){
     const idx=()=>Math.round(track.scrollLeft/Math.max(1,track.clientWidth+8));
     const sync=()=>{ const i=Math.min(n-1,Math.max(0,idx())); prev.hidden=i<=0; next.hidden=i>=n-1;
       dots.forEach((d,k)=>d.classList.toggle("on",k===i)); count.textContent=(cols[i]?cap(cols[i])+" · ":"")+`${i+1} / ${n}`;
-      if(g._i!==i){ g._i=i; g.dispatchEvent(new CustomEvent("galchange",{detail:{i,color:cols[i]||""}})); } };
+      if(g._i!==i){ g._i=i; stopVideos(g,track.children[i]); g.dispatchEvent(new CustomEvent("galchange",{detail:{i,color:cols[i]||""}})); } };
     const go=dir=>{ const i=Math.min(n-1,Math.max(0,idx()+dir));
       track.scrollTo({left:i*(track.clientWidth+8),behavior:REDUCED.matches?"auto":"smooth"}); };
     track.addEventListener("scroll",()=>{ cancelAnimationFrame(track._r); track._r=requestAnimationFrame(sync); },{passive:true});
@@ -1523,15 +1553,15 @@ function scrollRow(row){
 
 /* Pantalla completa: las mismas fotos en grande, con flechas, puntos y contador */
 const LB = {open:false,pushed:false,trigger:null};
-function openLightbox(ids,alt,start,trigger,colors){
+function openLightbox(ids,alt,start,trigger,colors,kinds){
   const lb=$("lb");
-  lb.innerHTML=`<button class="lb-x" type="button" data-lb-close aria-label="Cerrar pantalla completa">×</button>${galleryHtml(ids,alt,false,true,colors)}${ZOOM_CTL}
+  lb.innerHTML=`<button class="lb-x" type="button" data-lb-close aria-label="Cerrar pantalla completa">×</button>${galleryHtml(ids,alt,false,true,colors,kinds)}${ZOOM_CTL}
     ${zoomTip()?`<div class="spin-hint zoom-hint" id="zoomHint">${COARSE.matches?"Pellizca o toca dos veces para acercar":"Usa la rueda del mouse o doble clic para acercar"}</div>`:""}`;
   lb.hidden=false; LB.open=true; LB.trigger=trigger||null;
   try{ history.pushState({lb:1},""); LB.pushed=true; }catch(e){}
   const tr=lb.querySelector(".gallery");
   bindGalleries(lb);
-  const Z=LB.zoom=makeZoom(tr,()=>{ const l=tr.querySelectorAll("img"); return l[Math.min(l.length-1,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)))]; },{hires:hiRes,
+  const Z=LB.zoom=makeZoom(tr,()=>{ const l=tr.children, el=l[Math.min(l.length-1,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)))]; return el&&el.tagName==="IMG"?el:null; },{hires:hiRes,
     onChange:on=>{ const h=$("zoomHint"); if(h&&on) h.classList.add("hide"); }});
   lb.querySelector(".gal").addEventListener("galchange",()=>Z.reset(false));
   setTimeout(()=>{ const h=$("zoomHint"); if(h) h.classList.add("hide"); },3500);
@@ -1556,7 +1586,7 @@ function motoSheet(d){
         <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       </div>
     </div>
-    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors):""}
+    ${d.photos.length?galleryHtml(d.photos,`${d.brand} ${d.model}`,false,false,d.photoColors,d.kinds):""}
     ${d.spin.length?`<button class="spin-btn" type="button" data-spin="${d.id}">${SPIN_ICON}<span>Ver en 360°</span>${d.spinColor?`<small>· ${cap(d.spinColor)}</small>`:""}</button>`:""}
     ${colorsBlock(d)}
     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badgesHtml(d)}</div>
@@ -1749,6 +1779,7 @@ function openSheet(html,trigger){
   bindDrag(); bindGalleries($("sheet")); bindColorPicks();
 }
 function closeSheet(velocity=0,fromHistory=false){
+  stopVideos($("sheet"));
   if(!$("modal").classList.contains("open")||SH.closing) return;
   SH.closing=true;
   if(SH.pushed){ SH.pushed=false; if(!fromHistory) history.back(); }
@@ -1884,8 +1915,9 @@ $("stores").addEventListener("click",e=>{const b=e.target.closest("[data-store]"
 $("scrim").addEventListener("click",()=>closeSheet());
 $("sheet").addEventListener("click",e=>{
   if(e.target.closest("[data-close]")){closeSheet();return;}
-  const zg=e.target.closest("[data-zoom], .gal .gallery img"); if(zg){ const g=zg.closest(".gal"); const tr=g.querySelector(".gallery");
-    openLightbox(g.dataset.ids.split(" "),g.dataset.alt,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)),zg,(g.dataset.colors||"").split(" ").map(c=>c.replace(/\+/g," "))); return; }
+  const pv=e.target.closest(".gal .vid"); if(pv){ playVideo(pv); return; }
+  const zg=e.target.closest("[data-zoom], .gal .gallery img"); if(zg){ const g=zg.closest(".gal"); const tr=g.querySelector(".gallery"); stopVideos(g);
+    openLightbox(g.dataset.ids.split(" "),g.dataset.alt,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth+8)),zg,(g.dataset.colors||"").split(" ").map(c=>c.replace(/\+/g," ")),(g.dataset.kinds||"").split(" ")); return; }
   const sp=e.target.closest("[data-spin]"); if(sp){ openSpin(DATA[+sp.dataset.spin],sp); return; }
   const cb=e.target.closest("[data-color-idx]"); if(cb){ const g=$("sheet").querySelector(".gal"); if(g&&g._goTo){ g._goTo(+cb.dataset.colorIdx);
     const sh=$("sheet"), top=g.offsetTop-($("dragZone")?$("dragZone").offsetHeight:0)-8; if(sh.scrollTop>top) sh.scrollTo({top:Math.max(0,top),behavior:REDUCED.matches?"auto":"smooth"}); track("ver_color",{modelo:g.dataset.alt,color:cb.dataset.color}); } return; }
@@ -1903,6 +1935,7 @@ $("lb").addEventListener("click",e=>{
   const Z=LB.zoom, zb=e.target.closest("[data-z]");
   if(zb){ if(Z){ const v=+zb.dataset.z; if(!v) Z.reset(true); else Z.at(Z.s*(v>0?1.6:1/1.6),null,null,true); } return; }
   if(e.target.closest(".gal-btn")){ if(Z) Z.reset(false); return; }
+  const pv=e.target.closest(".vid"); if(pv){ playVideo(pv); return; }
   if(Z&&e.target.classList.contains("gallery")&&(Z.s>1||performance.now()-Z.moved<400)) return;
   if(e.target.closest("[data-lb-close]")||e.target===$("lb")||e.target.classList.contains("gallery")) closeLightbox(); });
 /* En pantalla completa, Ctrl + rueda y el pellizco ya no agrandan la página entera */
