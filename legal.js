@@ -8,8 +8,8 @@ const CFG = {
   razon:"Inversiones Malhuayza E.I.R.L.", comercial:"Malhuayza Motors", ruc:"20534497351",
   domicilio:"Jr. Américo Oré 155, Huamanga, Ayacucho", referencia:"a 1 cuadra de la SUNAT",
   whatsapp:"51989005413", whatsappTxt:"989 005 413",
-  correo:"",                 // correo para reclamos y datos personales (cuando lo tengan, se muestra solo)
-  registroUrl:"",            // URL /exec de la aplicación web de Apps Script (registros-apps-script.gs)
+  correo:"motosracing705@hotmail.com",   // correo para reclamos y datos personales
+  registroUrl:"https://script.google.com/macros/s/AKfycbyu8re4M2AE2h39CeXliIrpvAQgSRa93DjrnDWVaVY57FAP6hZ-q-W2ndn3G6jzs6dJTw/exec",   // aplicación web de Apps Script (registros-apps-script.gs)
   bancoDatos:"Clientes y consultas de Malhuayza Motors",
   bancoCodigo:"",            // código de inscripción en el Registro Nacional de Protección de Datos Personales
   gaId:"G-M87ZML5VDM",
